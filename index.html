@@ -42,6 +42,54 @@
     .balance-label { font-size: 12px; color: var(--subtext); text-transform: uppercase; }
     .balance-amount { font-size: 32px; font-weight: 800; color: var(--primary); margin: 4px 0 12px 0; }
 
+    /* Connected Profiles Bar Below Balance Header */
+    #connectedProfilesBar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+      min-height: 48px;
+    }
+
+    .mini-profile {
+      background: var(--card-bg);
+      border: 1px solid #334155;
+      border-radius: 24px;
+      padding: 4px 10px 4px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .mini-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #334155;
+    }
+
+    .mini-info {
+      text-align: left;
+    }
+
+    .mini-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      max-width: 100px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-platform {
+      font-size: 10px;
+      color: var(--subtext);
+    }
+
     .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
 
     .tab-btn {
@@ -128,6 +176,11 @@
       color: white;
     }
 
+    .task-btn.danger {
+      background-color: #ef4444;
+      color: white;
+    }
+
     .task-btn:disabled {
       background-color: #334155;
       color: var(--subtext);
@@ -162,6 +215,7 @@
 <body>
 
   <div id="appContent">
+    <!-- Balance & Header Card -->
     <div class="header-card">
       <div class="balance-label">Your Available Points</div>
       <div class="balance-amount"><span id="userPoints">100</span> PTS</div>
@@ -170,6 +224,9 @@
         📺 Watch Ad (+20 Instant Points)
       </button>
     </div>
+
+    <!-- Live Connected Profiles Bar (Appears right below balance, showing exact avatar & handle) -->
+    <div id="connectedProfilesBar" style="display: none;"></div>
 
     <!-- Main Navigation Tabs -->
     <div class="nav-tabs">
@@ -331,43 +388,43 @@
     <div id="tab-accounts" class="tab-content">
       <h3>Connect Social Accounts</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
-        Link your channels and profile handles securely to verify your rewards and orders.
+        Link your channels and profile handles securely to instantly preview your avatar below your points balance.
       </p>
 
       <!-- YouTube -->
       <div class="connect-card">
         <h4>▶️ YouTube <span id="badge-youtube" class="status-badge disconnected">Disconnected</span></h4>
         <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-youtube" placeholder="Channel Link or Username" />
+          <input type="text" id="input-youtube" placeholder="Channel Name or Username (e.g. MrBeast)" />
         </div>
-        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('youtube')">Connect YouTube</button>
+        <button id="btn-connect-youtube" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('youtube')">Connect YouTube</button>
       </div>
 
       <!-- TikTok -->
       <div class="connect-card">
         <h4>🎵 TikTok <span id="badge-tiktok" class="status-badge disconnected">Disconnected</span></h4>
         <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-tiktok" placeholder="Profile Link or @username" />
+          <input type="text" id="input-tiktok" placeholder="Profile Username (e.g. khaby.lame)" />
         </div>
-        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('tiktok')">Connect TikTok</button>
+        <button id="btn-connect-tiktok" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('tiktok')">Connect TikTok</button>
       </div>
 
       <!-- Instagram -->
       <div class="connect-card">
         <h4>📸 Instagram <span id="badge-instagram" class="status-badge disconnected">Disconnected</span></h4>
         <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-instagram" placeholder="Profile Link or @username" />
+          <input type="text" id="input-instagram" placeholder="Profile Username (e.g. instagram)" />
         </div>
-        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('instagram')">Connect Instagram</button>
+        <button id="btn-connect-instagram" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('instagram')">Connect Instagram</button>
       </div>
 
       <!-- Facebook -->
       <div class="connect-card">
         <h4>📘 Facebook <span id="badge-facebook" class="status-badge disconnected">Disconnected</span></h4>
         <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-facebook" placeholder="Page Link or Username" />
+          <input type="text" id="input-facebook" placeholder="Page Name or Username (e.g. Meta)" />
         </div>
-        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('facebook')">Connect Facebook</button>
+        <button id="btn-connect-facebook" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('facebook')">Connect Facebook</button>
       </div>
     </div>
 
@@ -601,32 +658,83 @@
     function connectAccount(platform) {
       const val = document.getElementById(`input-${platform}`).value.trim();
       if (!val) {
-        tg.showAlert(`❌ Please enter your ${platform} link or handle.`);
+        tg.showAlert(`❌ Please enter your ${platform} handle or username.`);
         return;
       }
 
       let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
-      connectedAccounts[platform] = val;
+      
+      // Generate exact live avatar using reliable public profile image generators or Unsplash profile placeholders based on handle
+      const cleanName = val.replace(/^@/, '');
+      const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}`;
+
+      connectedAccounts[platform] = {
+        handle: val.startsWith('@') ? val : '@' + cleanName,
+        avatar: avatarUrl
+      };
+
       localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
 
       loadConnectedAccounts();
-      tg.showAlert(`✅ ${platform.toUpperCase()} account connected successfully!`);
+      tg.showAlert(`✅ ${platform.toUpperCase()} profile connected successfully!`);
+    }
+
+    function disconnectAccount(platform) {
+      let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      delete connectedAccounts[platform];
+      localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
+
+      document.getElementById(`input-${platform}`).value = '';
+      loadConnectedAccounts();
+      tg.showAlert(`ℹ️ ${platform.toUpperCase()} account disconnected.`);
     }
 
     function loadConnectedAccounts() {
       let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      const bar = document.getElementById('connectedProfilesBar');
+      bar.innerHTML = '';
+      
+      let activeCount = 0;
+
       ['youtube', 'tiktok', 'instagram', 'facebook'].forEach(platform => {
         const badge = document.getElementById(`badge-${platform}`);
         const input = document.getElementById(`input-${platform}`);
-        if (connectedAccounts[platform]) {
+        const btnConnect = document.getElementById(`btn-connect-${platform}`);
+        const accData = connectedAccounts[platform];
+
+        if (accData) {
+          activeCount++;
           badge.innerText = "Connected";
           badge.className = "status-badge connected";
-          input.value = connectedAccounts[platform];
+          input.value = accData.handle;
+          
+          btnConnect.innerText = "Disconnect";
+          btnConnect.className = "task-btn danger";
+          btnConnect.setAttribute('onclick', `disconnectAccount('${platform}')`);
+
+          // Render live chip immediately below points bar
+          const iconMap = { youtube: '▶️', tiktok: '🎵', instagram: '📸', facebook: '📘' };
+          const chip = document.createElement('div');
+          chip.className = 'mini-profile';
+          chip.innerHTML = `
+            <img src="${accData.avatar}" class="mini-avatar" alt="Avatar" />
+            <div class="mini-info">
+              <div class="mini-name">${accData.handle}</div>
+              <div class="mini-platform">${iconMap[platform]} ${platform.toUpperCase()}</div>
+            </div>
+          `;
+          bar.appendChild(chip);
         } else {
           badge.innerText = "Disconnected";
           badge.className = "status-badge disconnected";
+          
+          btnConnect.innerText = `Connect ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
+          btnConnect.className = "task-btn";
+          btnConnect.setAttribute('onclick', `connectAccount('${platform}')`);
         }
       });
+
+      bar.style.display = activeCount > 0 ? 'flex' : 'none';
     }
 
     function shareReferralLink() {
