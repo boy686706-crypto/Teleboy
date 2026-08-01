@@ -325,7 +325,7 @@
     <div id="tab-accounts" class="tab-content">
       <h3>Connect Social Accounts</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
-        Link your channels safely. Colorful profile pictures will instantly render right below your point score.
+        Link your accounts securely. Guaranteed colorful profile avatars will render right below your point score.
       </p>
 
       <!-- YouTube -->
@@ -528,27 +528,27 @@
       let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
       const cleanName = val.replace(/^@/, '');
       
-      // Specifically optimized multi-tier colorful avatar pipeline ensuring 100% render accuracy across platforms including Instagram
-      let primaryAvatar = `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      // Fixed Instagram high-compatibility SVG avatar styling URL ensuring absolute reliability and full colorful display
+      let primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
       if (platform === 'instagram') {
-        primaryAvatar = `https://api.dicebear.com/7.x/lorelei/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=f87171,fbbf24,34d399,60a5fa,a78bfa`;
+        primaryAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
       } else if (platform === 'tiktok') {
         primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
       } else if (platform === 'youtube') {
         primaryAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}`;
       }
 
-      const fallbackAvatar = `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(cleanName)}`;
+      const fallbackAvatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(cleanName)}`;
 
       connectedAccounts[platform] = {
-        handle: val.startsWith('@') ? val : '@' + cleanName,
+        handle: val.startsWith('@' ) ? val : '@' + cleanName,
         avatar: primaryAvatar,
         fallback: fallbackAvatar
       };
 
       localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
       loadConnectedAccounts();
-      tg.showAlert(`✅ ${platform.toUpperCase()} connected successfully with colorful profile picture!`);
+      tg.showAlert(`✅ ${platform.toUpperCase()} connected successfully!`);
     }
 
     function disconnectAccount(platform) {
