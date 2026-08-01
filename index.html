@@ -351,7 +351,7 @@
 
     let pendingVerification = JSON.parse(localStorage.getItem('pending_verification') || '{}');
 
-    // Dynamic Rotating Task Databases containing multiple unique profiles and video links per task type
+    // Dynamic Rotating Task Databases with unique specific profile vs video URLs
     const taskPools = {
       'tg-join': [
         { id: 'tg_1', name: 'Join Channel: Tech Insider', url: 'https://t.me/telegram', reward: 15 },
@@ -394,7 +394,6 @@
       setInterval(renderAllTasks, 1000); // Live countdown tick every second
     });
 
-    // Retrieves current active task index or advances it upon cooldown completion
     function getCurrentTask(type) {
       let taskIndices = JSON.parse(localStorage.getItem('task_indices') || '{}');
       let taskCooldowns = JSON.parse(localStorage.getItem('task_cooldowns') || '{}');
@@ -406,12 +405,10 @@
       const lastCompletedTime = taskCooldowns[type] || 0;
       const timeElapsed = now - lastCompletedTime;
 
-      // If cooldown period (2 hours) has fully elapsed, rotate to the next unique task item in the pool
       if (lastCompletedTime > 0 && timeElapsed >= COOLDOWN_DURATION) {
         currentIndex = (currentIndex + 1) % pool.length;
         taskIndices[type] = currentIndex;
         localStorage.setItem('task_indices', JSON.stringify(taskIndices));
-        // Clear old cooldown timestamp for the newly rotated task item
         delete taskCooldowns[type];
         localStorage.setItem('task_cooldowns', JSON.stringify(taskCooldowns));
       }
@@ -499,7 +496,6 @@
         delete pendingVerification[type];
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
 
-        // Start strict 2-hour independent cooldown timer for this task category
         let taskCooldowns = JSON.parse(localStorage.getItem('task_cooldowns') || '{}');
         taskCooldowns[type] = Date.now();
         localStorage.setItem('task_cooldowns', JSON.stringify(taskCooldowns));
@@ -572,11 +568,12 @@
       let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
       const cleanName = val.replace(/^@/, '');
       
-      let primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
-      if (platform === 'tiktok') {
-        primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
-      } else if (platform === 'youtube') {
-        primaryAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}`;
+      // Fixed working DiceBear v7 stable colorful endpoint styles without blank/transparent artifacts
+      let primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      if (platform === 'youtube') {
+        primaryAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      } else if (platform === 'tiktok') {
+        primaryAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
       }
 
       const fallbackAvatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(cleanName)}`;
@@ -643,7 +640,7 @@
           
           btnConnect.innerText = `Connect ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
           btnConnect.className = "task-btn";
-          btnConnect.setAttribute('onclick', `connectAccount('${platform}')`);
+          btnConnect.setAttribute('onclick`, `connectAccount('${platform}')`);
         }
       });
 
