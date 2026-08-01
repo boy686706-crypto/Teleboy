@@ -1,46 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Telegram App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Boost Hub</title>
 
-    <!-- Telegram SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag Script (Your Zone 11463730) -->
-    <script src='//libtl.com/sdk.js' data-zone='11463730' data-sdk='show_11463730'></script>
+  <!-- Monetag Ad Script (REPLACE YOUR_ZONE_ID WITH YOUR MONETAG ZONE ID) -->
+  <script src="https://alwingulla.com/88/tag.min.js" data-zone="YOUR_ZONE_ID" async data-cfasync="false"></script>
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #38bdf8;
+      --accent: #22c55e;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+
+    .header-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .balance-label { font-size: 12px; color: var(--subtext); text-transform: uppercase; }
+    .balance-amount { font-size: 32px; font-weight: 800; color: var(--primary); margin: 4px 0 12px 0; }
+
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--card-bg);
+      color: var(--subtext);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-btn.active { background-color: var(--primary); color: #0f172a; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .btn-ad { background-color: var(--accent); color: white; }
+    .btn-primary { background-color: var(--primary); color: #0f172a; }
+
+    .task-item {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .task-info h4 { margin: 0 0 4px 0; font-size: 15px; }
+    .task-info p { margin: 0; font-size: 12px; color: var(--subtext); }
+
+    .task-btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background-color: var(--primary);
+      color: #0f172a;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .input-group { margin-bottom: 12px; text-align: left; }
+    .input-group label { display: block; font-size: 13px; color: var(--subtext); margin-bottom: 4px; }
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background-color: #0f172a;
+      color: white;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
-<body style="background-color: #121212; color: #ffffff; text-align: center; font-family: sans-serif; padding-top: 50px;">
+<body>
 
-    <h1>Welcome to My Bot App</h1>
-    <p>Watch a short ad to earn your reward!</p>
+  <!-- Top Balance Card -->
+  <div class="header-card">
+    <div class="balance-label">Your Available Points</div>
+    <div class="balance-amount"><span id="userPoints">100</span> PTS</div>
 
-        <!-- Button to launch ad -->
-    <button onclick="playAd()" style="background-color: #0088cc; color: white; padding: 15px 25px; border: none; border-radius: 8px;">
-      🎁 Watch Ad
+    <button class="btn btn-ad" onclick="watchAdForPoints()">
+      📺 Watch Ad (+20 Instant Points)
     </button>
-    
-<script>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('earn')">Earn Points</button>
+    <button class="tab-btn" onclick="switchTab('boost')">Promote Link</button>
+    <button class="tab-btn" onclick="switchTab('referral')">Referral</button>
+  </div>
+
+  <!-- TAB 1: EARN POINTS -->
+  <div id="tab-earn" class="tab-content active">
+    <h3>Active Tasks</h3>
+    <div id="taskList">
+      <div class="task-item">
+        <div class="task-info">
+          <h4>Subscribe to Channel</h4>
+          <p>Reward: +15 Points</p>
+        </div>
+        <button class="task-btn" onclick="completeTask('https://t.me/telegram', 15)">Join (+15)</button>
+      </div>
+
+      <div class="task-item">
+        <div class="task-info">
+          <h4>Like YouTube Video</h4>
+          <p>Reward: +10 Points</p>
+        </div>
+        <button class="task-btn" onclick="completeTask('https://youtube.com', 10)">Open (+10)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: PROMOTE LINK -->
+  <div id="tab-boost" class="tab-content">
+    <h3>Create a Task</h3>
+    <form onsubmit="handleCampaignSubmit(event)">
+      <div class="input-group">
+        <label>Platform Type</label>
+        <select id="platformType" required>
+          <option value="telegram">Telegram Member</option>
+          <option value="youtube">YouTube View/Like</option>
+          <option value="instagram">Instagram Follower</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Your Target Link</label>
+        <input type="url" id="targetUrl" placeholder="https://t.me/xinsin_bot" required />
+      </div>
+
+      <div class="input-group">
+        <label>Quantity (10 PTS per person)</label>
+        <input type="number" id="targetQty" min="10" value="10" oninput="calculateCost()" required />
+      </div>
+
+      <p style="font-size: 13px; color: var(--subtext);">
+        Total Cost: <strong id="campaignCost" style="color: var(--primary);">100</strong> Points + 1 Ad Setup Fee
+      </p>
+
+      <button type="submit" class="btn btn-primary">
+        🚀 Watch Ad & Submit Task
+      </button>
+    </form>
+  </div>
+
+  <!-- TAB 3: REFERRAL -->
+  <div id="tab-referral" class="tab-content">
+    <h3>Invite & Earn Points</h3>
+    <p style="font-size: 14px; color: var(--subtext); line-height: 1.5;">
+      Earn <strong>+100 Points</strong> for every user who joins through your link!
+    </p>
+
+    <button class="btn btn-primary" onclick="shareReferralLink()">
+      📲 Share Referral Link
+    </button>
+  </div>
+
+  <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    function playAd() {
-      if (typeof show_11463730 === 'function') {
-        show_11463730().then(() => {
-          alert('🎉 Ad completed! You earned your reward.');
-        }).catch((err) => {
-          alert('Ad was closed or failed to load.');
+    // Set your bot username here
+    const BOT_USERNAME = "xinsin_bot"; 
+
+    let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
+    document.getElementById('userPoints').innerText = userPoints;
+
+    function updatePoints(amount) {
+      userPoints += amount;
+      localStorage.setItem('app_user_points', userPoints);
+      document.getElementById('userPoints').innerText = userPoints;
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      event.target.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function watchAdForPoints() {
+      // Calls Monetag Ad Handler
+      const showAdFunc = Object.keys(window).find(key => key.startsWith('show_'));
+      if (showAdFunc && typeof window[showAdFunc] === 'function') {
+        window[showAdFunc]().then(() => {
+          updatePoints(20);
+          tg.showAlert("🎉 You earned +20 Points for watching the ad!");
+        }).catch(() => {
+          updatePoints(20);
         });
       } else {
-        alert('Ad is loading, please try again in a few seconds.');
+        updatePoints(20);
+        tg.showAlert("🎉 +20 Points added!");
       }
     }
 
-    // Automatically trigger ad as soon as the app opens
-    window.onload = function() {
-      playAd();
-    };
-</script> 
+    function completeTask(url, reward) {
+      tg.openLink(url);
+      setTimeout(() => {
+        updatePoints(reward);
+        tg.showAlert(`✅ +${reward} Points added to your balance.`);
+      }, 3000);
+    }
+
+    function calculateCost() {
+      const qty = parseInt(document.getElementById('targetQty').value) || 0;
+      document.getElementById('campaignCost').innerText = qty * 10;
+    }
+
+    function handleCampaignSubmit(e) {
+      e.preventDefault();
+      const qty = parseInt(document.getElementById('targetQty').value);
+      const totalCost = qty * 10;
+
+      if (userPoints < totalCost) {
+        tg.showAlert(`❌ You need ${totalCost} points. Watch ads to earn more!`);
+        return;
+      }
+
+      watchAdForPoints();
+      updatePoints(-totalCost);
+      tg.showAlert("🚀 Promotion campaign active!");
+    }
+
+    function shareReferralLink() {
+      const userId = tg.initDataUnsafe?.user?.id || 'demo';
+      const referralLink = `https://t.me/${BOT_USERNAME}?startapp=${userId}`;
+      const shareText = "🔥 Join me to get REAL free Telegram subscribers, views, and likes!";
+      
+      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+      tg.openTelegramLink(shareUrl);
+    }
+  </script>
 </body>
 </html>
