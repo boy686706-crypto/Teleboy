@@ -28,6 +28,7 @@
       margin: 0;
       padding: 16px;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .header-card {
@@ -79,13 +80,15 @@
 
     .tab-btn {
       flex: 1;
-      padding: 10px;
+      padding: 12px 8px;
       border: none;
       border-radius: 10px;
       background-color: var(--card-bg);
       color: var(--subtext);
       font-weight: 600;
+      font-size: 13px;
       cursor: pointer;
+      outline: none;
     }
 
     .tab-btn.active { background-color: var(--primary); color: #0f172a; }
@@ -110,6 +113,7 @@
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
+      outline: none;
     }
 
     .platform-chip.active {
@@ -127,6 +131,7 @@
       font-size: 15px;
       cursor: pointer;
       margin-bottom: 10px;
+      outline: none;
     }
 
     .btn-ad { background-color: var(--accent); color: white; }
@@ -146,7 +151,7 @@
     .task-info p { margin: 0; font-size: 11px; color: var(--subtext); }
 
     .task-btn {
-      padding: 8px 12px;
+      padding: 10px 12px;
       border: none;
       border-radius: 8px;
       background-color: var(--primary);
@@ -156,6 +161,7 @@
       cursor: pointer;
       min-width: 115px;
       text-align: center;
+      outline: none;
     }
 
     .task-btn.verify-state { background-color: var(--accent); color: white; }
@@ -172,6 +178,7 @@
       background-color: #0f172a;
       color: white;
       box-sizing: border-box;
+      outline: none;
     }
 
     .connect-card {
@@ -195,7 +202,7 @@
       <div class="balance-label">Your Available Points</div>
       <div class="balance-amount"><span id="userPoints">100</span> PTS</div>
 
-      <button class="btn btn-ad" onclick="watchAdForPoints()">
+      <button class="btn btn-ad" id="watchAdBtn">
         📺 Watch Ad (+20 Instant Points)
       </button>
     </div>
@@ -205,10 +212,10 @@
 
     <!-- Main Navigation Tabs -->
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('earn', event)">Earn Points</button>
-      <button class="tab-btn" onclick="switchTab('store', event)">🎁 Store</button>
-      <button class="tab-btn" onclick="switchTab('accounts', event)">🔗 Accounts</button>
-      <button class="tab-btn" onclick="switchTab('referral', event)">Referral</button>
+      <button class="tab-btn active" data-tab="earn">Earn Points</button>
+      <button class="tab-btn" data-tab="store">🎁 Store</button>
+      <button class="tab-btn" data-tab="accounts">🔗 Accounts</button>
+      <button class="tab-btn" data-tab="referral">Referral</button>
     </div>
 
     <!-- TAB 1: EARN POINTS -->
@@ -216,9 +223,9 @@
       <h3>Select Social Platform</h3>
       
       <div class="platform-selector">
-        <button class="platform-chip active" onclick="switchPlatform('telegram', event)">✈️ Telegram</button>
-        <button class="platform-chip" onclick="switchPlatform('youtube', event)">▶️ YouTube</button>
-        <button class="platform-chip" onclick="switchPlatform('tiktok', event)">🎵 TikTok</button>
+        <button class="platform-chip active" data-platform="telegram">✈️ Telegram</button>
+        <button class="platform-chip" data-platform="youtube">▶️ YouTube</button>
+        <button class="platform-chip" data-platform="tiktok">🎵 TikTok</button>
       </div>
 
       <!-- TELEGRAM -->
@@ -228,7 +235,7 @@
             <h4 id="title-tg-join">Join Telegram Channel</h4>
             <p id="sub-tg-join">Reward: +15 Points</p>
           </div>
-          <button id="btn-tg-join" class="task-btn" onclick="handleTaskAction('tg-join')">Join (+15)</button>
+          <button id="btn-tg-join" class="task-btn" data-action="tg-join">Join (+15)</button>
         </div>
       </div>
 
@@ -239,14 +246,14 @@
             <h4 id="title-yt-sub">Subscribe to Channel</h4>
             <p id="sub-yt-sub">Reward: +15 Points</p>
           </div>
-          <button id="btn-yt-sub" class="task-btn" onclick="handleTaskAction('yt-sub')">Subscribe (+15)</button>
+          <button id="btn-yt-sub" class="task-btn" data-action="yt-sub">Subscribe (+15)</button>
         </div>
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-yt-like">Like YouTube Video</h4>
             <p id="sub-yt-like">Reward: +10 Points</p>
           </div>
-          <button id="btn-yt-like" class="task-btn" onclick="handleTaskAction('yt-like')">Like (+10)</button>
+          <button id="btn-yt-like" class="task-btn" data-action="yt-like">Like (+10)</button>
         </div>
       </div>
 
@@ -257,14 +264,14 @@
             <h4 id="title-tt-follow">Follow TikTok Profile</h4>
             <p id="sub-tt-follow">Reward: +10 Points</p>
           </div>
-          <button id="btn-tt-follow" class="task-btn" onclick="handleTaskAction('tt-follow')">Follow (+10)</button>
+          <button id="btn-tt-follow" class="task-btn" data-action="tt-follow">Follow (+10)</button>
         </div>
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-tt-like">Like TikTok Post</h4>
             <p id="sub-tt-like">Reward: +10 Points</p>
           </div>
-          <button id="btn-tt-like" class="task-btn" onclick="handleTaskAction('tt-like')">Like (+10)</button>
+          <button id="btn-tt-like" class="task-btn" data-action="tt-like">Like (+10)</button>
         </div>
       </div>
     </div>
@@ -276,7 +283,7 @@
         Spend your points to get instant followers, likes, or subscribers for your accounts!
       </p>
 
-      <form onsubmit="handleStoreRedeem(event)">
+      <form id="storeForm">
         <div class="input-group">
           <label>Select Reward Package</label>
           <select id="storeItem" required>
@@ -312,7 +319,7 @@
         <div class="input-group" style="margin-bottom:8px;">
           <input type="text" id="input-youtube" placeholder="Enter exact channel handle or username" />
         </div>
-        <button id="btn-connect-youtube" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('youtube')">Connect YouTube</button>
+        <button id="btn-connect-youtube" class="task-btn" style="width:100%; padding:10px;" data-connect="youtube">Connect YouTube</button>
       </div>
 
       <!-- TikTok -->
@@ -321,7 +328,7 @@
         <div class="input-group" style="margin-bottom:8px;">
           <input type="text" id="input-tiktok" placeholder="Enter TikTok username" />
         </div>
-        <button id="btn-connect-tiktok" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('tiktok')">Connect TikTok</button>
+        <button id="btn-connect-tiktok" class="task-btn" style="width:100%; padding:10px;" data-connect="tiktok">Connect TikTok</button>
       </div>
     </div>
 
@@ -332,7 +339,7 @@
         Earn <strong>+100 Points</strong> for every user who joins through your link!
       </p>
 
-      <button class="btn btn-primary" onclick="shareReferralLink()">
+      <button class="btn btn-primary" id="shareReferralBtn">
         📲 Share Referral Link
       </button>
     </div>
@@ -389,10 +396,60 @@
     };
 
     document.addEventListener("DOMContentLoaded", () => {
+      initEventListeners();
       renderAllTasks();
       loadConnectedAccounts();
       setInterval(renderAllTasks, 1000); // Live countdown tick every second
     });
+
+    // Robust event listener binding to completely eliminate inline click bugs on mobile webviews
+    function initEventListeners() {
+      // Main Tab Navigation
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const tabName = e.currentTarget.getAttribute('data-tab');
+          switchTab(tabName, e.currentTarget);
+        });
+      });
+
+      // Earn Platform Switcher
+      document.querySelectorAll('.platform-chip').forEach(chip => {
+        chip.addEventListener('click', (e) => {
+          const platformName = e.currentTarget.getAttribute('data-platform');
+          switchPlatform(platformName, e.currentTarget);
+        });
+      });
+
+      // Earn Task Buttons
+      document.querySelectorAll('.task-btn[data-action]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const actionType = e.currentTarget.getAttribute('data-action');
+          handleTaskAction(actionType);
+        });
+      });
+
+      // Watch Ad Button
+      document.getElementById('watchAdBtn').addEventListener('click', watchAdForPoints);
+
+      // Store Submission Form
+      document.getElementById('storeForm').addEventListener('submit', handleStoreRedeem);
+
+      // Account Connection / Disconnection buttons
+      document.querySelectorAll('[data-connect]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const platform = e.currentTarget.getAttribute('data-connect');
+          const connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+          if (connectedAccounts[platform]) {
+            disconnectAccount(platform);
+          } else {
+            connectAccount(platform);
+          }
+        });
+      });
+
+      // Referral Share Button
+      document.getElementById('shareReferralBtn').addEventListener('click', shareReferralLink);
+    }
 
     function getCurrentTask(type) {
       let taskIndices = JSON.parse(localStorage.getItem('task_indices') || '{}');
@@ -528,8 +585,149 @@
       document.getElementById('userPoints').innerText = userPoints;
     }
 
-    function switchTab(tabName, evt) {
+    function switchTab(tabName, clickedElement) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       
-  
+      if (clickedElement) {
+        clickedElement.classList.add('active');
+      }
+
+      const targetTab = document.getElementById(`tab-${tabName}`);
+      if (targetTab) targetTab.classList.add('active');
+    }
+
+    function switchPlatform(platformName, clickedElement) {
+      document.querySelectorAll('.platform-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.platform-tasks').forEach(p => p.style.display = 'none');
+      
+      if (clickedElement) {
+        clickedElement.classList.add('active');
+      }
+
+      const targetPlatform = document.getElementById(`platform-${platformName}`);
+      if (targetPlatform) targetPlatform.style.display = 'block';
+    }
+
+    function handleStoreRedeem(e) {
+      e.preventDefault();
+      const itemKey = document.getElementById('storeItem').value;
+      const targetUrl = document.getElementById('storeTargetUrl').value;
+      const cost = storePrices[itemKey] || 200;
+
+      if (userPoints < cost) {
+        tg.showAlert(`❌ You need ${cost} points to claim this package. Earn more points first!`);
+        return;
+      }
+
+      updatePoints(-cost);
+      tg.showAlert(`🎉 Success! Your order has been placed for ${targetUrl}. Delivery will begin shortly.`);
+      document.getElementById('storeTargetUrl').value = '';
+    }
+
+    function connectAccount(platform) {
+      const inputElem = document.getElementById(`input-${platform}`);
+      const val = inputElem ? inputElem.value.trim() : '';
+      if (!val) {
+        tg.showAlert(`❌ Please enter a valid profile handle or username.`);
+        return;
+      }
+
+      let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      const cleanName = val.replace(/^@/, '');
+      
+      let primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      if (platform === 'youtube') {
+        primaryAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      } else if (platform === 'tiktok') {
+        primaryAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      }
+
+      const fallbackAvatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(cleanName)}`;
+
+      connectedAccounts[platform] = {
+        handle: val.startsWith('@') ? val : '@' + cleanName,
+        avatar: primaryAvatar,
+        fallback: fallbackAvatar
+      };
+
+      localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
+      loadConnectedAccounts();
+      tg.showAlert(`✅ ${platform.toUpperCase()} connected successfully!`);
+    }
+
+    function disconnectAccount(platform) {
+      let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      delete connectedAccounts[platform];
+      localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
+
+      const inputElem = document.getElementById(`input-${platform}`);
+      if (inputElem) inputElem.value = '';
+      loadConnectedAccounts();
+      tg.showAlert(`ℹ️ ${platform.toUpperCase()} connection revoked.`);
+    }
+
+    function loadConnectedAccounts() {
+      let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      const bar = document.getElementById('connectedProfilesBar');
+      bar.innerHTML = '';
+      
+      let activeCount = 0;
+
+      ['youtube', 'tiktok'].forEach(platform => {
+        const badge = document.getElementById(`badge-${platform}`);
+        const input = document.getElementById(`input-${platform}`);
+        const btnConnect = document.getElementById(`btn-connect-${platform}`);
+        const accData = connectedAccounts[platform];
+
+        if (accData) {
+          activeCount++;
+          if (badge) {
+            badge.innerText = "Connected";
+            badge.className = "status-badge connected";
+          }
+          if (input) input.value = accData.handle;
+          
+          if (btnConnect) {
+            btnConnect.innerText = "Disconnect Account";
+            btnConnect.className = "task-btn danger";
+          }
+
+          const iconMap = { youtube: '▶️', tiktok: '🎵' };
+          const chip = document.createElement('div');
+          chip.className = 'mini-profile';
+          
+          chip.innerHTML = `
+            <img src="${accData.avatar}" class="mini-avatar" alt="Avatar" onerror="this.onerror=null; this.src='${accData.fallback}';" />
+            <div class="mini-info">
+              <div class="mini-name">${accData.handle}</div>
+              <div class="mini-platform">${iconMap[platform]} ${platform.toUpperCase()}</div>
+            </div>
+          `;
+          bar.appendChild(chip);
+        } else {
+          if (badge) {
+            badge.innerText = "Disconnected";
+            badge.className = "status-badge disconnected";
+          }
+          
+          if (btnConnect) {
+            btnConnect.innerText = `Connect ${platform.charAt(0).toUpperCase() + platform.slice(1)}`;
+            btnConnect.className = "task-btn";
+          }
+        }
+      });
+
+      bar.style.display = activeCount > 0 ? 'flex' : 'none';
+    }
+
+    function shareReferralLink() {
+      const userId = tg.initDataUnsafe?.user?.id || 'demo';
+      const referralLink = `https://t.me/${BOT_USERNAME}?startapp=${userId}`;
+      const shareText = "🔥 Join me to get REAL free Telegram subscribers, views, and likes!";
+      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
+      tg.openTelegramLink(shareUrl);
+    }
+  </script>
+</body>
+</html>
