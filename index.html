@@ -145,6 +145,18 @@
       color: white;
       box-sizing: border-box;
     }
+
+    .connect-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #334155;
+    }
+    .connect-card h4 { margin: 0 0 8px 0; font-size: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+    .status-badge.disconnected { background: #334155; color: var(--subtext); }
+    .status-badge.connected { background: rgba(34, 197, 94, 0.2); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -163,6 +175,7 @@
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('earn', event)">Earn Points</button>
       <button class="tab-btn" onclick="switchTab('store', event)">🎁 Store</button>
+      <button class="tab-btn" onclick="switchTab('accounts', event)">🔗 Accounts</button>
       <button class="tab-btn" onclick="switchTab('referral', event)">Referral</button>
     </div>
 
@@ -284,7 +297,7 @@
 
     </div>
 
-    <!-- TAB 2: STORE (EXCHANGE POINTS FOR FOLLOWERS/LIKES/SUBS) -->
+    <!-- TAB 2: STORE -->
     <div id="tab-store" class="tab-content">
       <h3>Redeem Points Shop</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
@@ -314,7 +327,51 @@
       </form>
     </div>
 
-    <!-- TAB 3: REFERRAL -->
+    <!-- TAB 3: CONNECT ACCOUNTS -->
+    <div id="tab-accounts" class="tab-content">
+      <h3>Connect Social Accounts</h3>
+      <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
+        Link your channels and profile handles securely to verify your rewards and orders.
+      </p>
+
+      <!-- YouTube -->
+      <div class="connect-card">
+        <h4>▶️ YouTube <span id="badge-youtube" class="status-badge disconnected">Disconnected</span></h4>
+        <div class="input-group" style="margin-bottom:8px;">
+          <input type="text" id="input-youtube" placeholder="Channel Link or Username" />
+        </div>
+        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('youtube')">Connect YouTube</button>
+      </div>
+
+      <!-- TikTok -->
+      <div class="connect-card">
+        <h4>🎵 TikTok <span id="badge-tiktok" class="status-badge disconnected">Disconnected</span></h4>
+        <div class="input-group" style="margin-bottom:8px;">
+          <input type="text" id="input-tiktok" placeholder="Profile Link or @username" />
+        </div>
+        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('tiktok')">Connect TikTok</button>
+      </div>
+
+      <!-- Instagram -->
+      <div class="connect-card">
+        <h4>📸 Instagram <span id="badge-instagram" class="status-badge disconnected">Disconnected</span></h4>
+        <div class="input-group" style="margin-bottom:8px;">
+          <input type="text" id="input-instagram" placeholder="Profile Link or @username" />
+        </div>
+        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('instagram')">Connect Instagram</button>
+      </div>
+
+      <!-- Facebook -->
+      <div class="connect-card">
+        <h4>📘 Facebook <span id="badge-facebook" class="status-badge disconnected">Disconnected</span></h4>
+        <div class="input-group" style="margin-bottom:8px;">
+          <input type="text" id="input-facebook" placeholder="Page Link or Username" />
+        </div>
+        <button class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('facebook')">Connect Facebook</button>
+      </div>
+    </div>
+
+    <!-- TAB 4: REFERRAL -->
     <div id="tab-referral" class="tab-content">
       <h3>Invite & Earn Points</h3>
       <p style="font-size: 14px; color: var(--subtext); line-height: 1.5;">
@@ -402,6 +459,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       renderAllTasks();
+      loadConnectedAccounts();
       setInterval(checkCooldownTimers, 10000);
     });
 
@@ -538,6 +596,37 @@
       updatePoints(-cost);
       tg.showAlert(`🎉 Success! Your order has been placed for ${targetUrl}. Delivery will begin shortly.`);
       document.getElementById('storeTargetUrl').value = '';
+    }
+
+    function connectAccount(platform) {
+      const val = document.getElementById(`input-${platform}`).value.trim();
+      if (!val) {
+        tg.showAlert(`❌ Please enter your ${platform} link or handle.`);
+        return;
+      }
+
+      let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      connectedAccounts[platform] = val;
+      localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
+
+      loadConnectedAccounts();
+      tg.showAlert(`✅ ${platform.toUpperCase()} account connected successfully!`);
+    }
+
+    function loadConnectedAccounts() {
+      let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
+      ['youtube', 'tiktok', 'instagram', 'facebook'].forEach(platform => {
+        const badge = document.getElementById(`badge-${platform}`);
+        const input = document.getElementById(`input-${platform}`);
+        if (connectedAccounts[platform]) {
+          badge.innerText = "Connected";
+          badge.className = "status-badge connected";
+          input.value = connectedAccounts[platform];
+        } else {
+          badge.innerText = "Disconnected";
+          badge.className = "status-badge disconnected";
+        }
+      });
     }
 
     function shareReferralLink() {
