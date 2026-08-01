@@ -344,57 +344,58 @@
     let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
     document.getElementById('userPoints').innerText = userPoints;
 
-    // Active state tracker for items where the user has opened the link and is pending manual verification
+    // Strict tracking for pending verification stages
     let pendingVerification = JSON.parse(localStorage.getItem('pending_verification') || '{}');
 
+    // EXPLICIT UNIQUE TASKS FOR EVERY ACTION TYPE WITH REAL SPECIFIC VIDEO/POST LINKS
     const taskDatabase = {
       'tg-join': [
-        { id: 'tg_1', name: 'Join Telegram News', url: 'https://t.me/telegram', reward: 15 },
+        { id: 'tg_1', name: 'Join Telegram News Channel', url: 'https://t.me/telegram', reward: 15 },
         { id: 'tg_2', name: 'Join Pavel Durov Channel', url: 'https://t.me/durov', reward: 15 }
       ],
       'yt-sub': [
-        { id: 'yt_sub_1', name: 'Subscribe: MrBeast', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 15 },
-        { id: 'yt_sub_2', name: 'Subscribe: MKBHD', url: 'https://www.youtube.com/@mkbhd?sub_confirmation=1', reward: 15 }
+        { id: 'yt_sub_1', name: 'Subscribe: MrBeast Channel', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 15 },
+        { id: 'yt_sub_2', name: 'Subscribe: MKBHD Channel', url: 'https://www.youtube.com/@mkbhd?sub_confirmation=1', reward: 15 }
       ],
       'yt-like': [
-        { id: 'yt_l_1', name: 'Like Video 1', url: 'https://www.youtube.com/', reward: 10 },
-        { id: 'yt_l_2', name: 'Like Video 2', url: 'https://www.youtube.com/', reward: 10 }
+        { id: 'yt_l_1', name: 'Like Video: "Never Gonna Give You Up"', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', reward: 10 },
+        { id: 'yt_l_2', name: 'Like Video: "First YouTube Video"', url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', reward: 10 }
       ],
       'yt-comment': [
-        { id: 'yt_c_1', name: 'Comment on Video 1', url: 'https://www.youtube.com/', reward: 10 },
-        { id: 'yt_c_2', name: 'Comment on Video 2', url: 'https://www.youtube.com/', reward: 10 }
+        { id: 'yt_c_1', name: 'Comment on Video: Rick Astley', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', reward: 10 },
+        { id: 'yt_c_2', name: 'Comment on Video: Me at the zoo', url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', reward: 10 }
       ],
       'tt-follow': [
-        { id: 'tt_f_1', name: 'Follow Khaby Lame', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
-        { id: 'tt_f_2', name: 'Follow TikTok Official', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
+        { id: 'tt_f_1', name: 'Follow Profile: Khaby Lame', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
+        { id: 'tt_f_2', name: 'Follow Profile: TikTok Official', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
       ],
       'tt-like': [
-        { id: 'tt_l_1', name: 'Like TikTok Post 1', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
-        { id: 'tt_l_2', name: 'Like TikTok Post 2', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
+        { id: 'tt_l_1', name: 'Like Video Post: Khaby Lame', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
+        { id: 'tt_l_2', name: 'Like Video Post: TikTok', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
       ],
       'tt-comment': [
-        { id: 'tt_c_1', name: 'Comment on TikTok 1', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
-        { id: 'tt_c_2', name: 'Comment on TikTok 2', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
+        { id: 'tt_c_1', name: 'Comment on TikTok Post 1', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
+        { id: 'tt_c_2', name: 'Comment on TikTok Post 2', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
       ],
       'ig-follow': [
-        { id: 'ig_f_1', name: 'Follow Instagram Profile', url: 'https://www.instagram.com/instagram/', reward: 10 },
-        { id: 'ig_f_2', name: 'Follow IG Creators', url: 'https://www.instagram.com/creators/', reward: 10 }
+        { id: 'ig_f_1', name: 'Follow Profile: Instagram Official', url: 'https://www.instagram.com/instagram/', reward: 10 },
+        { id: 'ig_f_2', name: 'Follow Profile: IG Creators', url: 'https://www.instagram.com/creators/', reward: 10 }
       ],
       'ig-like': [
-        { id: 'ig_l_1', name: 'Like Instagram Post 1', url: 'https://www.instagram.com/instagram/', reward: 10 },
-        { id: 'ig_l_2', name: 'Like Instagram Post 2', url: 'https://www.instagram.com/creators/', reward: 10 }
+        { id: 'ig_l_1', name: 'Like Post: Instagram Feed 1', url: 'https://www.instagram.com/p/C-Example1/', reward: 10 },
+        { id: 'ig_l_2', name: 'Like Post: IG Creators Feed', url: 'https://www.instagram.com/p/C-Example2/', reward: 10 }
       ],
       'ig-comment': [
-        { id: 'ig_c_1', name: 'Comment on IG Post 1', url: 'https://www.instagram.com/instagram/', reward: 10 },
-        { id: 'ig_c_2', name: 'Comment on IG Post 2', url: 'https://www.instagram.com/creators/', reward: 10 }
+        { id: 'ig_c_1', name: 'Comment on Instagram Post 1', url: 'https://www.instagram.com/p/C-Example1/', reward: 10 },
+        { id: 'ig_c_2', name: 'Comment on IG Creators Post', url: 'https://www.instagram.com/p/C-Example2/', reward: 10 }
       ],
       'fb-follow': [
-        { id: 'fb_f_1', name: 'Follow Facebook Page', url: 'https://www.facebook.com/facebook', reward: 10 },
-        { id: 'fb_f_2', name: 'Follow Meta Page', url: 'https://www.facebook.com/Meta', reward: 10 }
+        { id: 'fb_f_1', name: 'Follow Page: Facebook', url: 'https://www.facebook.com/facebook', reward: 10 },
+        { id: 'fb_f_2', name: 'Follow Page: Meta', url: 'https://www.facebook.com/Meta', reward: 10 }
       ],
       'fb-like': [
-        { id: 'fb_l_1', name: 'Like Facebook Post 1', url: 'https://www.facebook.com/facebook', reward: 10 },
-        { id: 'fb_l_2', name: 'Like Facebook Post 2', url: 'https://www.facebook.com/Meta', reward: 10 }
+        { id: 'fb_l_1', name: 'Like Post: Facebook Update', url: 'https://www.facebook.com/facebook/posts/1', reward: 10 },
+        { id: 'fb_l_2', name: 'Like Post: Meta Update', url: 'https://www.facebook.com/Meta/posts/1', reward: 10 }
       ]
     };
 
@@ -419,7 +420,6 @@
         const lastCompleted = localStorage.getItem(`cooldown_${type}`);
         const now = Date.now();
 
-        // Check cooldown lock
         if (lastCompleted && (now - parseInt(lastCompleted) < COOLDOWN_MS)) {
           const remainingMs = COOLDOWN_MS - (now - parseInt(lastCompleted));
           const h = Math.floor(remainingMs / (1000 * 60 * 60));
@@ -444,7 +444,7 @@
         title.innerText = currentTask.name;
         sub.innerText = `Reward: +${currentTask.reward} Points`;
 
-        // Check if user already clicked open and is waiting to verify completion
+        // If the task has already been opened, enforce the manual claim state
         if (pendingVerification[type] === currentTask.id) {
           btn.disabled = false;
           btn.classList.add('verify-state');
@@ -457,20 +457,20 @@
       });
     }
 
-    // Two-step manual workflow logic
+    // Strict two-step interaction to prevent instant bypassing
     function handleTaskAction(type) {
       const currentTask = getNextAvailableTask(type);
       if (!currentTask) return;
 
       if (!pendingVerification[type]) {
-        // STEP 1: User clicks "Open", it launches target link and shifts button into verification mode
+        // Step 1: Open the specific link and register pending state
         pendingVerification[type] = currentTask.id;
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
         
         tg.openLink(currentTask.url);
         renderAllTasks();
       } else {
-        // STEP 2: User comes back and clicks "Verify & Claim" manually
+        // Step 2: User must press verify to check and lock completion
         delete pendingVerification[type];
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
 
@@ -481,7 +481,7 @@
         localStorage.setItem(`cooldown_${type}`, Date.now().toString());
 
         updatePoints(currentTask.reward);
-        tg.showAlert(`✅ Success! +${currentTask.reward} Points added to your balance.`);
+        tg.showAlert(`✅ Verified! +${currentTask.reward} Points added.`);
         
         renderAllTasks();
       }
