@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Telegram App</title>
+
+    <!-- Telegram SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <!-- Monetag Script (Your Zone 11463730) -->
+    <script src='//libtl.com/sdk.js' data-zone='11463730' data-sdk='show_11463730'></script>
+</head>
+<body style="background-color: #121212; color: #ffffff; text-align: center; font-family: sans-serif; padding-top: 50px;">
+
+    <h1>Welcome to My Bot App</h1>
+    <p>Watch a short ad to earn your reward!</p>
+
+    <!-- Button to launch ad -->
+    <button onclick="playAd()" style="background-color: #0088cc; color: white; padding: 15px 25px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+        🎁 Watch Ad
+    </button>
+
+    <script>
+      function playAd() {
+        if (typeof show_11463730 === 'function') {
+          show_11463730().then(() => {
+            alert('🎉 Ad completed! You earned your reward.');
+          }).catch((err) => {
+            alert('Ad was closed or failed to load.');
+          });
+        } else {
+          alert('Ad is loading, please try again in a few seconds.');
+        }
+      }
+    </script>
+</body>
+</html>
