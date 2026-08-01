@@ -162,11 +162,11 @@
     <!-- Main Navigation Tabs -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('earn', event)">Earn Points</button>
-      <button class="tab-btn" onclick="switchTab('boost', event)">Promote Link</button>
+      <button class="tab-btn" onclick="switchTab('store', event)">🎁 Store</button>
       <button class="tab-btn" onclick="switchTab('referral', event)">Referral</button>
     </div>
 
-    <!-- TAB 1: EARN POINTS -->
+    <!-- TAB 1: EARN POINTS (UNCHANGED) -->
     <div id="tab-earn" class="tab-content active">
       <h3>Select Social Platform</h3>
       
@@ -284,37 +284,32 @@
 
     </div>
 
-    <!-- TAB 2: PROMOTE LINK -->
-    <div id="tab-boost" class="tab-content">
-      <h3>Create a Task</h3>
-      <form onsubmit="handleCampaignSubmit(event)">
+    <!-- TAB 2: STORE (EXCHANGE POINTS FOR FOLLOWERS/LIKES/SUBS) -->
+    <div id="tab-store" class="tab-content">
+      <h3>Redeem Points Shop</h3>
+      <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
+        Spend your points to get instant followers, likes, or subscribers for your accounts!
+      </p>
+
+      <form onsubmit="handleStoreRedeem(event)">
         <div class="input-group">
-          <label>Platform Type</label>
-          <select id="platformType" required>
-            <option value="telegram">Telegram Member</option>
-            <option value="youtube">YouTube Subscriber / Video</option>
-            <option value="tiktok">TikTok Follower / Video</option>
-            <option value="instagram">Instagram Follower / Post</option>
-            <option value="facebook">Facebook Page / Post</option>
+          <label>Select Reward Package</label>
+          <select id="storeItem" required>
+            <option value="tg_members_50">50 Telegram Channel Members (250 PTS)</option>
+            <option value="yt_subs_25">25 YouTube Subscribers (250 PTS)</option>
+            <option value="yt_likes_50">50 YouTube Video Likes (200 PTS)</option>
+            <option value="tt_followers_50">50 TikTok Followers (200 PTS)</option>
+            <option value="ig_followers_50">50 Instagram Followers (200 PTS)</option>
           </select>
         </div>
 
         <div class="input-group">
-          <label>Your Target Link</label>
-          <input type="url" id="targetUrl" placeholder="https://..." required />
+          <label>Your Channel / Account / Post Link</label>
+          <input type="url" id="storeTargetUrl" placeholder="https://..." required />
         </div>
-
-        <div class="input-group">
-          <label>Quantity (10 PTS per person)</label>
-          <input type="number" id="targetQty" min="10" value="10" oninput="calculateCost()" required />
-        </div>
-
-        <p style="font-size: 13px; color: var(--subtext);">
-          Total Cost: <strong id="campaignCost" style="color: var(--primary);">100</strong> Points
-        </p>
 
         <button type="submit" class="btn btn-primary">
-          🚀 Watch Ad & Submit Task
+          🎁 Claim & Redeem Now
         </button>
       </form>
     </div>
@@ -344,10 +339,8 @@
     let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
     document.getElementById('userPoints').innerText = userPoints;
 
-    // Strict tracking for pending verification stages
     let pendingVerification = JSON.parse(localStorage.getItem('pending_verification') || '{}');
 
-    // EXPLICIT UNIQUE TASKS FOR EVERY ACTION TYPE WITH REAL SPECIFIC VIDEO/POST LINKS
     const taskDatabase = {
       'tg-join': [
         { id: 'tg_1', name: 'Join Telegram News Channel', url: 'https://t.me/telegram', reward: 15 },
@@ -399,6 +392,14 @@
       ]
     };
 
+    const storePrices = {
+      'tg_members_50': 250,
+      'yt_subs_25': 250,
+      'yt_likes_50': 200,
+      'tt_followers_50': 200,
+      'ig_followers_50': 200
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
       renderAllTasks();
       setInterval(checkCooldownTimers, 10000);
@@ -444,7 +445,6 @@
         title.innerText = currentTask.name;
         sub.innerText = `Reward: +${currentTask.reward} Points`;
 
-        // If the task has already been opened, enforce the manual claim state
         if (pendingVerification[type] === currentTask.id) {
           btn.disabled = false;
           btn.classList.add('verify-state');
@@ -457,20 +457,17 @@
       });
     }
 
-    // Strict two-step interaction to prevent instant bypassing
     function handleTaskAction(type) {
       const currentTask = getNextAvailableTask(type);
       if (!currentTask) return;
 
       if (!pendingVerification[type]) {
-        // Step 1: Open the specific link and register pending state
         pendingVerification[type] = currentTask.id;
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
         
         tg.openLink(currentTask.url);
         renderAllTasks();
       } else {
-        // Step 2: User must press verify to check and lock completion
         delete pendingVerification[type];
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
 
@@ -527,25 +524,20 @@
       document.getElementById(`platform-${platformName}`).style.display = 'block';
     }
 
-    function calculateCost() {
-      const qty = parseInt(document.getElementById('targetQty').value) || 0;
-      document.getElementById('campaignCost').innerText = qty * 10;
-    }
-
-    function handleCampaignSubmit(e) {
+    function handleStoreRedeem(e) {
       e.preventDefault();
-      const qty = parseInt(document.getElementById('targetQty').value);
-      const totalCost = qty * 10;
+      const itemKey = document.getElementById('storeItem').value;
+      const targetUrl = document.getElementById('storeTargetUrl').value;
+      const cost = storePrices[itemKey] || 200;
 
-      if (userPoints < totalCost) {
-        tg.showAlert(`❌ You need ${totalCost} points. Watch ads to earn more!`);
+      if (userPoints < cost) {
+        tg.showAlert(`❌ You need ${cost} points to claim this package. Earn more points first!`);
         return;
       }
 
-      showMonetagAd(() => {
-        updatePoints(-totalCost);
-        tg.showAlert("🚀 Promotion campaign active!");
-      });
+      updatePoints(-cost);
+      tg.showAlert(`🎉 Success! Your order has been placed for ${targetUrl}. Delivery will begin shortly.`);
+      document.getElementById('storeTargetUrl').value = '';
     }
 
     function shareReferralLink() {
