@@ -244,7 +244,6 @@
         <button class="platform-chip active" onclick="switchPlatform('telegram', event)">✈️ Telegram</button>
         <button class="platform-chip" onclick="switchPlatform('youtube', event)">▶️ YouTube</button>
         <button class="platform-chip" onclick="switchPlatform('tiktok', event)">🎵 TikTok</button>
-        <button class="platform-chip" onclick="switchPlatform('instagram', event)">📸 Instagram</button>
       </div>
 
       <!-- TELEGRAM -->
@@ -279,17 +278,6 @@
           <button id="btn-tt-follow" class="task-btn" onclick="handleTaskAction('tt-follow')">Follow (+10)</button>
         </div>
       </div>
-
-      <!-- INSTAGRAM -->
-      <div id="platform-instagram" class="platform-tasks" style="display:none;">
-        <div class="task-item">
-          <div class="task-info">
-            <h4 id="title-ig-follow">Follow Instagram Profile</h4>
-            <p id="sub-ig-follow">Reward: +10 Points</p>
-          </div>
-          <button id="btn-ig-follow" class="task-btn" onclick="handleTaskAction('ig-follow')">Follow (+10)</button>
-        </div>
-      </div>
     </div>
 
     <!-- TAB 2: STORE -->
@@ -306,7 +294,6 @@
             <option value="tg_members_50">50 Telegram Channel Members (250 PTS)</option>
             <option value="yt_subs_25">25 YouTube Subscribers (250 PTS)</option>
             <option value="tt_followers_50">50 TikTok Followers (200 PTS)</option>
-            <option value="ig_followers_50">50 Instagram Followers (200 PTS)</option>
           </select>
         </div>
 
@@ -325,7 +312,7 @@
     <div id="tab-accounts" class="tab-content">
       <h3>Connect Social Accounts</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
-        Link your accounts securely. Guaranteed colorful profile avatars will render right below your point score.
+        Link your YouTube and TikTok accounts securely. Colorful profile avatars will render right below your point score.
       </p>
 
       <!-- YouTube -->
@@ -344,15 +331,6 @@
           <input type="text" id="input-tiktok" placeholder="Enter TikTok username" />
         </div>
         <button id="btn-connect-tiktok" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('tiktok')">Connect TikTok</button>
-      </div>
-
-      <!-- Instagram -->
-      <div class="connect-card">
-        <h4>📸 Instagram <span id="badge-instagram" class="status-badge disconnected">Disconnected</span></h4>
-        <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-instagram" placeholder="Enter Instagram handle" />
-        </div>
-        <button id="btn-connect-instagram" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('instagram')">Connect Instagram</button>
       </div>
     </div>
 
@@ -390,17 +368,13 @@
       ],
       'tt-follow': [
         { id: 'tt_f_1', name: 'Follow TikTok Profile', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
-      ],
-      'ig-follow': [
-        { id: 'ig_f_1', name: 'Follow Instagram Profile', url: 'https://www.instagram.com/instagram/', reward: 10 }
       ]
     };
 
     const storePrices = {
       'tg_members_50': 250,
       'yt_subs_25': 250,
-      'tt_followers_50': 200,
-      'ig_followers_50': 200
+      'tt_followers_50': 200
     };
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -528,11 +502,8 @@
       let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
       const cleanName = val.replace(/^@/, '');
       
-      // Fixed Instagram high-compatibility SVG avatar styling URL ensuring absolute reliability and full colorful display
       let primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
-      if (platform === 'instagram') {
-        primaryAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
-      } else if (platform === 'tiktok') {
+      if (platform === 'tiktok') {
         primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
       } else if (platform === 'youtube') {
         primaryAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}`;
@@ -541,7 +512,7 @@
       const fallbackAvatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(cleanName)}`;
 
       connectedAccounts[platform] = {
-        handle: val.startsWith('@' ) ? val : '@' + cleanName,
+        handle: val.startsWith('@') ? val : '@' + cleanName,
         avatar: primaryAvatar,
         fallback: fallbackAvatar
       };
@@ -568,7 +539,7 @@
       
       let activeCount = 0;
 
-      ['youtube', 'tiktok', 'instagram'].forEach(platform => {
+      ['youtube', 'tiktok'].forEach(platform => {
         const badge = document.getElementById(`badge-${platform}`);
         const input = document.getElementById(`input-${platform}`);
         const btnConnect = document.getElementById(`btn-connect-${platform}`);
@@ -584,7 +555,7 @@
           btnConnect.className = "task-btn danger";
           btnConnect.setAttribute('onclick', `disconnectAccount('${platform}')`);
 
-          const iconMap = { youtube: '▶️', tiktok: '🎵', instagram: '📸' };
+          const iconMap = { youtube: '▶️', tiktok: '🎵' };
           const chip = document.createElement('div');
           chip.className = 'mini-profile';
           
