@@ -290,27 +290,31 @@
     let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
     document.getElementById('userPoints').innerText = userPoints;
 
-    // --- UNIQUE ACCOUNTS QUEUE FOR EACH PLATFORM ---
+    // --- LIVE & DIRECT SOCIAL MEDIA TASK LINKS QUEUE ---
     const taskDatabase = {
       'tg-join': [
-        { id: 'tg_1', name: 'Telegram Channel 1', url: 'https://t.me/xinsin_updates', reward: 15 },
-        { id: 'tg_2', name: 'Telegram Channel 2', url: 'https://t.me/telegram', reward: 15 },
-        { id: 'tg_3', name: 'Telegram Channel 3', url: 'https://t.me/durov', reward: 15 }
+        { id: 'tg_1', name: 'Join Telegram News', url: 'https://t.me/telegram', reward: 15 },
+        { id: 'tg_2', name: 'Join Pavel Durov Channel', url: 'https://t.me/durov', reward: 15 },
+        { id: 'tg_3', name: 'Join Telegram Tips', url: 'https://t.me/telegramtips', reward: 15 }
       ],
       'yt-sub': [
-        { id: 'yt_1', name: 'YouTube Channel 1', url: 'https://www.youtube.com/@YouTube?sub_confirmation=1', reward: 15 },
-        { id: 'yt_2', name: 'YouTube Channel 2', url: 'https://www.youtube.com/@Google?sub_confirmation=1', reward: 15 }
+        { id: 'yt_1', name: 'Subscribe to MrBeast', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 15 },
+        { id: 'yt_2', name: 'Subscribe to MKBHD', url: 'https://www.youtube.com/@mkbhd?sub_confirmation=1', reward: 15 },
+        { id: 'yt_3', name: 'Subscribe to PewDiePie', url: 'https://www.youtube.com/@PewDiePie?sub_confirmation=1', reward: 15 }
       ],
       'tt-follow': [
-        { id: 'tt_1', name: 'TikTok Creator 1', url: 'https://www.tiktok.com/@tiktok', reward: 10 },
-        { id: 'tt_2', name: 'TikTok Creator 2', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 }
+        { id: 'tt_1', name: 'Follow Khaby Lame', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
+        { id: 'tt_2', name: 'Follow TikTok Official', url: 'https://www.tiktok.com/@tiktok', reward: 10 },
+        { id: 'tt_3', name: 'Follow Zach King', url: 'https://www.tiktok.com/@zachking', reward: 10 }
       ],
       'ig-follow': [
-        { id: 'ig_1', name: 'Instagram Page 1', url: 'https://www.instagram.com/instagram', reward: 10 },
-        { id: 'ig_2', name: 'Instagram Page 2', url: 'https://www.instagram.com/creators', reward: 10 }
+        { id: 'ig_1', name: 'Follow Instagram', url: 'https://www.instagram.com/instagram/', reward: 10 },
+        { id: 'ig_2', name: 'Follow Instagram Creators', url: 'https://www.instagram.com/creators/', reward: 10 },
+        { id: 'ig_3', name: 'Follow National Geographic', url: 'https://www.instagram.com/natgeo/', reward: 10 }
       ],
       'fb-follow': [
-        { id: 'fb_1', name: 'Facebook Page 1', url: 'https://www.facebook.com/facebook', reward: 10 }
+        { id: 'fb_1', name: 'Follow Facebook Page', url: 'https://www.facebook.com/facebook', reward: 10 },
+        { id: 'fb_2', name: 'Follow Meta Page', url: 'https://www.facebook.com/Meta', reward: 10 }
       ]
     };
 
@@ -360,6 +364,7 @@
       });
     }
 
+    // Strict Verification Countdown System
     function processTask(type) {
       const currentTask = getNextAvailableTask(type);
       if (!currentTask) {
@@ -369,18 +374,30 @@
 
       tg.openLink(currentTask.url);
 
-      setTimeout(() => {
-        const completedList = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
-        completedList.push(currentTask.id);
-        localStorage.setItem('completed_tasks', JSON.stringify(completedList));
+      const btn = document.getElementById(`btn-${type}`);
+      btn.disabled = true;
+      let timeLeft = 10; // 10-second mandatory verification wait
+      btn.innerText = `⏳ Verifying (${timeLeft}s)...`;
 
-        localStorage.setItem(`cooldown_${type}`, Date.now().toString());
+      const verificationTimer = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          btn.innerText = `⏳ Verifying (${timeLeft}s)...`;
+        } else {
+          clearInterval(verificationTimer);
 
-        updatePoints(currentTask.reward);
-        tg.showAlert(`✅ +${currentTask.reward} PTS added! A NEW account will load in 2 hours.`);
-        
-        renderAllTasks();
-      }, 4000);
+          const completedList = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
+          completedList.push(currentTask.id);
+          localStorage.setItem('completed_tasks', JSON.stringify(completedList));
+
+          localStorage.setItem(`cooldown_${type}`, Date.now().toString());
+
+          updatePoints(currentTask.reward);
+          tg.showAlert(`✅ Task verified! +${currentTask.reward} PTS added.`);
+          
+          renderAllTasks();
+        }
+      }, 1000);
     }
 
     function checkCooldownTimers() {
