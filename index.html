@@ -8,7 +8,7 @@
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- Monetag Ad Script (REPLACE YOUR_ZONE_ID WITH YOUR MONETAG ZONE ID) -->
+  <!-- Monetag TG SDK for Zone 3429762 -->
   <script src="https://alwingulla.com/88/tag.min.js" data-zone="3429762" async data-cfasync="false"></script>
 
   <style>
@@ -59,6 +59,33 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
+    /* Platform Sub-Tabs */
+    .platform-selector {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    .platform-chip {
+      background: var(--card-bg);
+      border: 1px solid #334155;
+      color: var(--subtext);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .platform-chip.active {
+      background: var(--primary);
+      color: #0f172a;
+      border-color: var(--primary);
+    }
+
     .btn {
       width: 100%;
       padding: 12px;
@@ -83,17 +110,24 @@
       justify-content: space-between;
     }
 
-    .task-info h4 { margin: 0 0 4px 0; font-size: 15px; }
-    .task-info p { margin: 0; font-size: 12px; color: var(--subtext); }
+    .task-info h4 { margin: 0 0 4px 0; font-size: 14px; }
+    .task-info p { margin: 0; font-size: 11px; color: var(--subtext); }
 
     .task-btn {
-      padding: 8px 14px;
+      padding: 8px 12px;
       border: none;
       border-radius: 8px;
       background-color: var(--primary);
       color: #0f172a;
       font-weight: 700;
+      font-size: 13px;
       cursor: pointer;
+    }
+
+    .task-btn:disabled {
+      background-color: #334155;
+      color: var(--subtext);
+      cursor: not-allowed;
     }
 
     .input-group { margin-bottom: 12px; text-align: left; }
@@ -111,99 +145,221 @@
 </head>
 <body>
 
-  <!-- Top Balance Card -->
-  <div class="header-card">
-    <div class="balance-label">Your Available Points</div>
-    <div class="balance-amount"><span id="userPoints">100</span> PTS</div>
+  <div id="appContent">
+    <div class="header-card">
+      <div class="balance-label">Your Available Points</div>
+      <div class="balance-amount"><span id="userPoints">100</span> PTS</div>
 
-    <button class="btn btn-ad" onclick="watchAdForPoints()">
-      📺 Watch Ad (+20 Instant Points)
-    </button>
-  </div>
-
-  <!-- Navigation Tabs -->
-  <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('earn')">Earn Points</button>
-    <button class="tab-btn" onclick="switchTab('boost')">Promote Link</button>
-    <button class="tab-btn" onclick="switchTab('referral')">Referral</button>
-  </div>
-
-  <!-- TAB 1: EARN POINTS -->
-  <div id="tab-earn" class="tab-content active">
-    <h3>Active Tasks</h3>
-    <div id="taskList">
-      <div class="task-item">
-        <div class="task-info">
-          <h4>Subscribe to Channel</h4>
-          <p>Reward: +15 Points</p>
-        </div>
-        <button class="task-btn" onclick="completeTask('https://t.me/telegram', 15)">Join (+15)</button>
-      </div>
-
-      <div class="task-item">
-        <div class="task-info">
-          <h4>Like YouTube Video</h4>
-          <p>Reward: +10 Points</p>
-        </div>
-        <button class="task-btn" onclick="completeTask('https://youtube.com', 10)">Open (+10)</button>
-      </div>
+      <button class="btn btn-ad" onclick="watchAdForPoints()">
+        📺 Watch Ad (+20 Instant Points)
+      </button>
     </div>
-  </div>
 
-  <!-- TAB 2: PROMOTE LINK -->
-  <div id="tab-boost" class="tab-content">
-    <h3>Create a Task</h3>
-    <form onsubmit="handleCampaignSubmit(event)">
-      <div class="input-group">
-        <label>Platform Type</label>
-        <select id="platformType" required>
-          <option value="telegram">Telegram Member</option>
-          <option value="youtube">YouTube View/Like</option>
-          <option value="instagram">Instagram Follower</option>
-        </select>
+    <!-- Main Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('earn', event)">Earn Points</button>
+      <button class="tab-btn" onclick="switchTab('boost', event)">Promote Link</button>
+      <button class="tab-btn" onclick="switchTab('referral', event)">Referral</button>
+    </div>
+
+    <!-- TAB 1: EARN POINTS -->
+    <div id="tab-earn" class="tab-content active">
+      <h3>Select Social Platform</h3>
+      
+      <!-- Social Media Platform Chips -->
+      <div class="platform-selector">
+        <button class="platform-chip active" onclick="switchPlatform('telegram', event)">✈️ Telegram</button>
+        <button class="platform-chip" onclick="switchPlatform('youtube', event)">▶️ YouTube</button>
+        <button class="platform-chip" onclick="switchPlatform('tiktok', event)">🎵 TikTok</button>
+        <button class="platform-chip" onclick="switchPlatform('instagram', event)">📸 Instagram</button>
+        <button class="platform-chip" onclick="switchPlatform('facebook', event)">📘 Facebook</button>
       </div>
 
-      <div class="input-group">
-        <label>Your Target Link</label>
-        <input type="url" id="targetUrl" placeholder="https://t.me/xinsin_bot" required />
+      <!-- TELEGRAM TASKS -->
+      <div id="platform-telegram" class="platform-tasks">
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Join Official Telegram Channel</h4>
+            <p>Reward: +15 Points</p>
+          </div>
+          <button id="btn-tg-join" class="task-btn" onclick="executeTask('tg-join', 'https://t.me/telegram', 15)">Join (+15)</button>
+        </div>
       </div>
 
-      <div class="input-group">
-        <label>Quantity (10 PTS per person)</label>
-        <input type="number" id="targetQty" min="10" value="10" oninput="calculateCost()" required />
+      <!-- YOUTUBE TASKS -->
+      <div id="platform-youtube" class="platform-tasks" style="display:none;">
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Subscribe to YouTube Channel</h4>
+            <p>Reward: +15 Points</p>
+          </div>
+          <button id="btn-yt-sub" class="task-btn" onclick="executeTask('yt-sub', 'https://www.youtube.com', 15)">Subscribe (+15)</button>
+        </div>
       </div>
 
-      <p style="font-size: 13px; color: var(--subtext);">
-        Total Cost: <strong id="campaignCost" style="color: var(--primary);">100</strong> Points + 1 Ad Setup Fee
+      <!-- TIKTOK TASKS -->
+      <div id="platform-tiktok" class="platform-tasks" style="display:none;">
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Follow TikTok Account</h4>
+            <p>Reward: +10 Points</p>
+          </div>
+          <button id="btn-tt-follow" class="task-btn" onclick="executeTask('tt-follow', 'https://www.tiktok.com', 10)">Follow (+10)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Like TikTok Video</h4>
+            <p>Reward: +5 Points</p>
+          </div>
+          <button id="btn-tt-like" class="task-btn" onclick="executeTask('tt-like', 'https://www.tiktok.com', 5)">Like (+5)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Comment on TikTok Video</h4>
+            <p>Reward: +5 Points</p>
+          </div>
+          <button id="btn-tt-comment" class="task-btn" onclick="executeTask('tt-comment', 'https://www.tiktok.com', 5)">Comment (+5)</button>
+        </div>
+      </div>
+
+      <!-- INSTAGRAM TASKS -->
+      <div id="platform-instagram" class="platform-tasks" style="display:none;">
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Follow Instagram Profile</h4>
+            <p>Reward: +10 Points</p>
+          </div>
+          <button id="btn-ig-follow" class="task-btn" onclick="executeTask('ig-follow', 'https://www.instagram.com', 10)">Follow (+10)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Like Instagram Post</h4>
+            <p>Reward: +5 Points</p>
+          </div>
+          <button id="btn-ig-like" class="task-btn" onclick="executeTask('ig-like', 'https://www.instagram.com', 5)">Like (+5)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Comment on Instagram Post</h4>
+            <p>Reward: +5 Points</p>
+          </div>
+          <button id="btn-ig-comment" class="task-btn" onclick="executeTask('ig-comment', 'https://www.instagram.com', 5)">Comment (+5)</button>
+        </div>
+      </div>
+
+      <!-- FACEBOOK TASKS -->
+      <div id="platform-facebook" class="platform-tasks" style="display:none;">
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Follow Facebook Page</h4>
+            <p>Reward: +10 Points</p>
+          </div>
+          <button id="btn-fb-follow" class="task-btn" onclick="executeTask('fb-follow', 'https://www.facebook.com', 10)">Follow (+10)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Like Facebook Post</h4>
+            <p>Reward: +5 Points</p>
+          </div>
+          <button id="btn-fb-like" class="task-btn" onclick="executeTask('fb-like', 'https://www.facebook.com', 5)">Like (+5)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4>Comment on Facebook Post</h4>
+            <p>Reward: +5 Points</p>
+          </div>
+          <button id="btn-fb-comment" class="task-btn" onclick="executeTask('fb-comment', 'https://www.facebook.com', 5)">Comment (+5)</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 2: PROMOTE LINK -->
+    <div id="tab-boost" class="tab-content">
+      <h3>Create a Task</h3>
+      <form onsubmit="handleCampaignSubmit(event)">
+        <div class="input-group">
+          <label>Platform Type</label>
+          <select id="platformType" required>
+            <option value="telegram">Telegram Member</option>
+            <option value="youtube">YouTube Subscriber</option>
+            <option value="tiktok">TikTok Follower / Like</option>
+            <option value="instagram">Instagram Follower / Like</option>
+            <option value="facebook">Facebook Follower / Like</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Your Target Link</label>
+          <input type="url" id="targetUrl" placeholder="https://..." required />
+        </div>
+
+        <div class="input-group">
+          <label>Quantity (10 PTS per person)</label>
+          <input type="number" id="targetQty" min="10" value="10" oninput="calculateCost()" required />
+        </div>
+
+        <p style="font-size: 13px; color: var(--subtext);">
+          Total Cost: <strong id="campaignCost" style="color: var(--primary);">100</strong> Points
+        </p>
+
+        <button type="submit" class="btn btn-primary">
+          🚀 Watch Ad & Submit Task
+        </button>
+      </form>
+    </div>
+
+    <!-- TAB 3: REFERRAL -->
+    <div id="tab-referral" class="tab-content">
+      <h3>Invite & Earn Points</h3>
+      <p style="font-size: 14px; color: var(--subtext); line-height: 1.5;">
+        Earn <strong>+100 Points</strong> for every user who joins through your link!
       </p>
 
-      <button type="submit" class="btn btn-primary">
-        🚀 Watch Ad & Submit Task
+      <button class="btn btn-primary" onclick="shareReferralLink()">
+        📲 Share Referral Link
       </button>
-    </form>
-  </div>
-
-  <!-- TAB 3: REFERRAL -->
-  <div id="tab-referral" class="tab-content">
-    <h3>Invite & Earn Points</h3>
-    <p style="font-size: 14px; color: var(--subtext); line-height: 1.5;">
-      Earn <strong>+100 Points</strong> for every user who joins through your link!
-    </p>
-
-    <button class="btn btn-primary" onclick="shareReferralLink()">
-      📲 Share Referral Link
-    </button>
+    </div>
   </div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Set your bot username here
     const BOT_USERNAME = "xinsin_bot"; 
+    const ZONE_ID = "3429762";
+    const COOLDOWN_HOURS = 2;
+    const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
 
     let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
     document.getElementById('userPoints').innerText = userPoints;
+
+    // List of task IDs to track cooldowns
+    const allTaskIds = [
+      'tg-join', 'yt-sub', 
+      'tt-follow', 'tt-like', 'tt-comment',
+      'ig-follow', 'ig-like', 'ig-comment',
+      'fb-follow', 'fb-like', 'fb-comment'
+    ];
+
+    // Check timer status on app launch
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAllTaskCooldowns();
+      setInterval(checkAllTaskCooldowns, 10000); // refresh timer labels every 10s
+    });
+
+    function showMonetagAd(rewardCallback) {
+      const showAdFunc = window[`show_${ZONE_ID}`] || Object.keys(window).find(key => key.startsWith('show_') && typeof window[key] === 'function');
+      if (showAdFunc && typeof window[showAdFunc] === 'function') {
+        window[showAdFunc]()
+          .then(() => { rewardCallback(); })
+          .catch((err) => {
+            tg.showAlert("Ad closed early or failed. Try again!");
+          });
+      } else {
+        tg.showAlert("Ad network connecting... Try again in a few seconds!");
+      }
+    }
 
     function updatePoints(amount) {
       userPoints += amount;
@@ -211,36 +367,78 @@
       document.getElementById('userPoints').innerText = userPoints;
     }
 
-    function switchTab(tabName) {
+    function switchTab(tabName, evt) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-      event.target.classList.add('active');
+      if (evt && evt.target) evt.target.classList.add('active');
       document.getElementById(`tab-${tabName}`).classList.add('active');
     }
 
-    function watchAdForPoints() {
-      // Calls Monetag Ad Handler
-      const showAdFunc = Object.keys(window).find(key => key.startsWith('show_'));
-      if (showAdFunc && typeof window[showAdFunc] === 'function') {
-        window[showAdFunc]().then(() => {
-          updatePoints(20);
-          tg.showAlert("🎉 You earned +20 Points for watching the ad!");
-        }).catch(() => {
-          updatePoints(20);
-        });
-      } else {
-        updatePoints(20);
-        tg.showAlert("🎉 +20 Points added!");
-      }
+    function switchPlatform(platformName, evt) {
+      document.querySelectorAll('.platform-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.platform-tasks').forEach(p => p.style.display = 'none');
+
+      if (evt && evt.target) evt.target.classList.add('active');
+      document.getElementById(`platform-${platformName}`).style.display = 'block';
     }
 
-    function completeTask(url, reward) {
-      tg.openLink(url);
+    function executeTask(taskId, targetUrl, reward) {
+      const lastCompleted = localStorage.getItem(`task_time_${taskId}`);
+      const now = Date.now();
+
+      if (lastCompleted && (now - parseInt(lastCompleted) < COOLDOWN_MS)) {
+        tg.showAlert("⏳ This task is in cooldown. Please wait!");
+        return;
+      }
+
+      tg.openLink(targetUrl);
+
       setTimeout(() => {
+        localStorage.setItem(`task_time_${taskId}`, Date.now().toString());
         updatePoints(reward);
-        tg.showAlert(`✅ +${reward} Points added to your balance.`);
-      }, 3000);
+        tg.showAlert(`✅ +${reward} Points claimed! Task will reset in 2 hours.`);
+        checkAllTaskCooldowns();
+      }, 4000);
+    }
+
+    function checkAllTaskCooldowns() {
+      const now = Date.now();
+      allTaskIds.forEach(id => {
+        const btn = document.getElementById(`btn-${id}`);
+        if (!btn) return;
+
+        const lastCompleted = localStorage.getItem(`task_time_${id}`);
+        if (lastCompleted) {
+          const diff = now - parseInt(lastCompleted);
+          if (diff < COOLDOWN_MS) {
+            const remainingMs = COOLDOWN_MS - diff;
+            const hoursLeft = Math.floor(remainingMs / (1000 * 60 * 60));
+            const minsLeft = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+            btn.disabled = true;
+            btn.innerText = `⏳ ${hoursLeft}h ${minsLeft}m`;
+          } else {
+            btn.disabled = false;
+            btn.innerText = getOriginalBtnLabel(id);
+          }
+        }
+      });
+    }
+
+    function getOriginalBtnLabel(id) {
+      if (id.includes('join')) return 'Join (+15)';
+      if (id.includes('sub')) return 'Subscribe (+15)';
+      if (id.includes('follow')) return 'Follow (+10)';
+      if (id.includes('like')) return 'Like (+5)';
+      if (id.includes('comment')) return 'Comment (+5)';
+      return 'Claim';
+    }
+
+    function watchAdForPoints() {
+      showMonetagAd(() => {
+        updatePoints(20);
+        tg.showAlert("🎉 You earned +20 Points for watching the ad!");
+      });
     }
 
     function calculateCost() {
@@ -258,9 +456,10 @@
         return;
       }
 
-      watchAdForPoints();
-      updatePoints(-totalCost);
-      tg.showAlert("🚀 Promotion campaign active!");
+      showMonetagAd(() => {
+        updatePoints(-totalCost);
+        tg.showAlert("🚀 Promotion campaign active!");
+      });
     }
 
     function shareReferralLink() {
