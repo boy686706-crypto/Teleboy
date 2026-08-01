@@ -20,19 +20,26 @@
     <button onclick="playAd()" style="background-color: #0088cc; color: white; padding: 15px 25px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
         🎁 Watch Ad
     </button>
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-    <script>
-      function playAd() {
-        if (typeof show_11463730 === 'function') {
-          show_11463730().then(() => {
-            alert('🎉 Ad completed! You earned your reward.');
-          }).catch((err) => {
-            alert('Ad was closed or failed to load.');
-          });
-        } else {
-          alert('Ad is loading, please try again in a few seconds.');
-        }
+    function playAd() {
+      if (typeof show_11463730 === 'function') {
+        show_11463730().then(() => {
+          alert('🎉 Ad completed! You earned your reward.');
+        }).catch((err) => {
+          alert('Ad was closed or failed to load.');
+        });
+      } else {
+        alert('Ad is loading, please try again in a few seconds.');
       }
-    </script>
+    }
+
+    // Automatically trigger ad as soon as the app opens
+    window.onload = function() {
+      playAd();
+    };
+</script> 
 </body>
 </html>
