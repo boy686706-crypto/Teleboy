@@ -266,6 +266,13 @@
           </div>
           <button id="btn-yt-sub" class="task-btn" onclick="handleTaskAction('yt-sub')">Subscribe (+15)</button>
         </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4 id="title-yt-like">Like YouTube Video</h4>
+            <p id="sub-yt-like">Reward: +10 Points</p>
+          </div>
+          <button id="btn-yt-like" class="task-btn" onclick="handleTaskAction('yt-like')">Like (+10)</button>
+        </div>
       </div>
 
       <!-- TIKTOK -->
@@ -276,6 +283,13 @@
             <p id="sub-tt-follow">Reward: +10 Points</p>
           </div>
           <button id="btn-tt-follow" class="task-btn" onclick="handleTaskAction('tt-follow')">Follow (+10)</button>
+        </div>
+        <div class="task-item">
+          <div class="task-info">
+            <h4 id="title-tt-like">Like TikTok Post</h4>
+            <p id="sub-tt-like">Reward: +10 Points</p>
+          </div>
+          <button id="btn-tt-like" class="task-btn" onclick="handleTaskAction('tt-like')">Like (+10)</button>
         </div>
       </div>
     </div>
@@ -293,7 +307,9 @@
           <select id="storeItem" required>
             <option value="tg_members_50">50 Telegram Channel Members (250 PTS)</option>
             <option value="yt_subs_25">25 YouTube Subscribers (250 PTS)</option>
+            <option value="yt_likes_50">50 YouTube Video Likes (200 PTS)</option>
             <option value="tt_followers_50">50 TikTok Followers (200 PTS)</option>
+            <option value="tt_likes_50">50 TikTok Post Likes (200 PTS)</option>
           </select>
         </div>
 
@@ -353,6 +369,7 @@
 
     const BOT_USERNAME = "xinsin_bot"; 
     const ZONE_ID = "3429762";
+    const COOLDOWN_DURATION = 2 * 60 * 60 * 1000; // 2 Hours in milliseconds
 
     let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
     document.getElementById('userPoints').innerText = userPoints;
@@ -366,26 +383,60 @@
       'yt-sub': [
         { id: 'yt_sub_1', name: 'Subscribe: MrBeast Channel', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 15 }
       ],
+      'yt-like': [
+        { id: 'yt_l_1', name: 'Like YouTube Video', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', reward: 10 }
+      ],
       'tt-follow': [
         { id: 'tt_f_1', name: 'Follow TikTok Profile', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
+      ],
+      'tt-like': [
+        { id: 'tt_l_1', name: 'Like TikTok Post', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
       ]
     };
 
     const storePrices = {
       'tg_members_50': 250,
       'yt_subs_25': 250,
-      'tt_followers_50': 200
+      'yt_likes_50': 200,
+      'tt_followers_50': 200,
+      'tt_likes_50': 200
     };
 
     document.addEventListener("DOMContentLoaded", () => {
       renderAllTasks();
       loadConnectedAccounts();
+      setInterval(renderAllTasks, 1000); // Live countdown ticker every second
     });
 
-    function getNextAvailableTask(type) {
-      const completedList = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
+    function getTaskState(type) {
+      let taskCooldowns = JSON.parse(localStorage.getItem('task_cooldowns') || '{}');
+      let completedList = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
       const queue = taskDatabase[type] || [];
-      return queue.find(task => !completedList.includes(task.id));
+      const currentTask = queue[0]; // Active task loop
+
+      if (!currentTask) return { status: 'done' };
+
+      const now = Date.now();
+      const lastCompletedTime = taskCooldowns[type] || 0;
+      const timeElapsed = now - lastCompletedTime;
+
+      if (timeElapsed < COOLDOWN_DURATION) {
+        return { status: 'cooldown', timeLeft: COOLDOWN_DURATION - timeElapsed, task: currentTask };
+      }
+
+      if (pendingVerification[type] === currentTask.id) {
+        return { status: 'verify', task: currentTask };
+      }
+
+      return { status: 'ready', task: currentTask };
+    }
+
+    function formatTimeLeft(ms) {
+      const totalSecs = Math.ceil(ms / 1000);
+      const hours = Math.floor(totalSecs / 3600);
+      const minutes = Math.floor((totalSecs % 3600) / 60);
+      const seconds = totalSecs % 60;
+      return `${hours}h ${minutes}m ${seconds}s`;
     }
 
     function renderAllTasks() {
@@ -395,7 +446,9 @@
         const sub = document.getElementById(`sub-${type}`);
         if (!btn) return;
 
-        const currentTask = getNextAvailableTask(type);
+        const state = getTaskState(type);
+        const currentTask = state.task;
+
         if (!currentTask) {
           btn.disabled = true;
           btn.innerText = "Done";
@@ -403,13 +456,19 @@
         }
 
         title.innerText = currentTask.name;
-        sub.innerText = `Reward: +${currentTask.reward} Points`;
 
-        if (pendingVerification[type] === currentTask.id) {
+        if (state.status === 'cooldown') {
+          sub.innerText = `Resets in: ${formatTimeLeft(state.timeLeft)}`;
+          btn.disabled = true;
+          btn.classList.remove('verify-state');
+          btn.innerText = "⏳ Cooldown Active";
+        } else if (state.status === 'verify') {
+          sub.innerText = `Reward: +${currentTask.reward} Points`;
           btn.disabled = false;
           btn.classList.add('verify-state');
           btn.innerText = "✅ Verify & Claim";
         } else {
+          sub.innerText = `Reward: +${currentTask.reward} Points`;
           btn.disabled = false;
           btn.classList.remove('verify-state');
           btn.innerText = `Open (+${currentTask.reward})`;
@@ -418,24 +477,25 @@
     }
 
     function handleTaskAction(type) {
-      const currentTask = getNextAvailableTask(type);
-      if (!currentTask) return;
+      const state = getTaskState(type);
+      const currentTask = state.task;
+      if (!currentTask || state.status === 'cooldown') return;
 
-      if (!pendingVerification[type]) {
+      if (state.status === 'ready') {
         pendingVerification[type] = currentTask.id;
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
         tg.openLink(currentTask.url);
         renderAllTasks();
-      } else {
+      } else if (state.status === 'verify') {
         delete pendingVerification[type];
         localStorage.setItem('pending_verification', JSON.stringify(pendingVerification));
 
-        const completedList = JSON.parse(localStorage.getItem('completed_tasks') || '[]');
-        completedList.push(currentTask.id);
-        localStorage.setItem('completed_tasks', JSON.stringify(completedList));
+        let taskCooldowns = JSON.parse(localStorage.getItem('task_cooldowns') || '{}');
+        taskCooldowns[type] = Date.now();
+        localStorage.setItem('task_cooldowns', JSON.stringify(taskCooldowns));
 
         updatePoints(currentTask.reward);
-        tg.showAlert(`✅ Verified! +${currentTask.reward} Points added.`);
+        tg.showAlert(`✅ Verified! +${currentTask.reward} Points added. Next task unlocks in 2 hours.`);
         renderAllTasks();
       }
     }
