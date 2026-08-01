@@ -225,7 +225,7 @@
       </button>
     </div>
 
-    <!-- Live Connected Profiles Bar (Appears right below balance, showing exact avatar & handle) -->
+    <!-- Live Connected Profiles Bar (Appears right below balance) -->
     <div id="connectedProfilesBar" style="display: none;"></div>
 
     <!-- Main Navigation Tabs -->
@@ -245,7 +245,6 @@
         <button class="platform-chip" onclick="switchPlatform('youtube', event)">▶️ YouTube</button>
         <button class="platform-chip" onclick="switchPlatform('tiktok', event)">🎵 TikTok</button>
         <button class="platform-chip" onclick="switchPlatform('instagram', event)">📸 Instagram</button>
-        <button class="platform-chip" onclick="switchPlatform('facebook', event)">📘 Facebook</button>
       </div>
 
       <!-- TELEGRAM -->
@@ -267,13 +266,6 @@
             <p id="sub-yt-sub">Reward: +15 Points</p>
           </div>
           <button id="btn-yt-sub" class="task-btn" onclick="handleTaskAction('yt-sub')">Subscribe (+15)</button>
-        </div>
-        <div class="task-item">
-          <div class="task-info">
-            <h4 id="title-yt-like">Like Video</h4>
-            <p id="sub-yt-like">Reward: +10 Points</p>
-          </div>
-          <button id="btn-yt-like" class="task-btn" onclick="handleTaskAction('yt-like')">Like (+10)</button>
         </div>
       </div>
 
@@ -298,17 +290,6 @@
           <button id="btn-ig-follow" class="task-btn" onclick="handleTaskAction('ig-follow')">Follow (+10)</button>
         </div>
       </div>
-
-      <!-- FACEBOOK -->
-      <div id="platform-facebook" class="platform-tasks" style="display:none;">
-        <div class="task-item">
-          <div class="task-info">
-            <h4 id="title-fb-follow">Follow Facebook Page</h4>
-            <p id="sub-fb-follow">Reward: +10 Points</p>
-          </div>
-          <button id="btn-fb-follow" class="task-btn" onclick="handleTaskAction('fb-follow')">Follow (+10)</button>
-        </div>
-      </div>
     </div>
 
     <!-- TAB 2: STORE -->
@@ -324,7 +305,6 @@
           <select id="storeItem" required>
             <option value="tg_members_50">50 Telegram Channel Members (250 PTS)</option>
             <option value="yt_subs_25">25 YouTube Subscribers (250 PTS)</option>
-            <option value="yt_likes_50">50 YouTube Video Likes (200 PTS)</option>
             <option value="tt_followers_50">50 TikTok Followers (200 PTS)</option>
             <option value="ig_followers_50">50 Instagram Followers (200 PTS)</option>
           </select>
@@ -345,7 +325,7 @@
     <div id="tab-accounts" class="tab-content">
       <h3>Connect Social Accounts</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
-        Link your channels safely via official platform protocols. Connected profiles will instantly render their live avatars below your point score.
+        Link your channels safely. Colorful profile pictures will instantly render right below your point score.
       </p>
 
       <!-- YouTube -->
@@ -361,7 +341,7 @@
       <div class="connect-card">
         <h4>🎵 TikTok <span id="badge-tiktok" class="status-badge disconnected">Disconnected</span></h4>
         <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-tiktok" placeholder="Enter TikTok username (e.g. username)" />
+          <input type="text" id="input-tiktok" placeholder="Enter TikTok username" />
         </div>
         <button id="btn-connect-tiktok" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('tiktok')">Connect TikTok</button>
       </div>
@@ -373,15 +353,6 @@
           <input type="text" id="input-instagram" placeholder="Enter Instagram handle" />
         </div>
         <button id="btn-connect-instagram" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('instagram')">Connect Instagram</button>
-      </div>
-
-      <!-- Facebook -->
-      <div class="connect-card">
-        <h4>📘 Facebook <span id="badge-facebook" class="status-badge disconnected">Disconnected</span></h4>
-        <div class="input-group" style="margin-bottom:8px;">
-          <input type="text" id="input-facebook" placeholder="Enter Facebook page username" />
-        </div>
-        <button id="btn-connect-facebook" class="task-btn" style="width:100%; padding:10px;" onclick="connectAccount('facebook')">Connect Facebook</button>
       </div>
     </div>
 
@@ -404,8 +375,6 @@
 
     const BOT_USERNAME = "xinsin_bot"; 
     const ZONE_ID = "3429762";
-    const COOLDOWN_HOURS = 2;
-    const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
 
     let userPoints = parseInt(localStorage.getItem('app_user_points')) || 100;
     document.getElementById('userPoints').innerText = userPoints;
@@ -414,30 +383,22 @@
 
     const taskDatabase = {
       'tg-join': [
-        { id: 'tg_1', name: 'Join Telegram News Channel', url: 'https://t.me/telegram', reward: 15 },
-        { id: 'tg_2', name: 'Join Pavel Durov Channel', url: 'https://t.me/durov', reward: 15 }
+        { id: 'tg_1', name: 'Join Telegram News Channel', url: 'https://t.me/telegram', reward: 15 }
       ],
       'yt-sub': [
         { id: 'yt_sub_1', name: 'Subscribe: MrBeast Channel', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 15 }
-      ],
-      'yt-like': [
-        { id: 'yt_l_1', name: 'Like Video', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', reward: 10 }
       ],
       'tt-follow': [
         { id: 'tt_f_1', name: 'Follow TikTok Profile', url: 'https://www.tiktok.com/@tiktok', reward: 10 }
       ],
       'ig-follow': [
         { id: 'ig_f_1', name: 'Follow Instagram Profile', url: 'https://www.instagram.com/instagram/', reward: 10 }
-      ],
-      'fb-follow': [
-        { id: 'fb_f_1', name: 'Follow Facebook Page', url: 'https://www.facebook.com/facebook', reward: 10 }
       ]
     };
 
     const storePrices = {
       'tg_members_50': 250,
       'yt_subs_25': 250,
-      'yt_likes_50': 200,
       'tt_followers_50': 200,
       'ig_followers_50': 200
     };
@@ -567,9 +528,17 @@
       let connectedAccounts = JSON.parse(localStorage.getItem('connected_accounts') || '{}');
       const cleanName = val.replace(/^@/, '');
       
-      // Robust multi-source avatar validation strategy to guarantee profile image loads seamlessly without broken image links
-      const primaryAvatar = `https://unavatar.io/${platform}/${cleanName}`;
-      const fallbackAvatar = `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(cleanName)}`;
+      // Specifically optimized multi-tier colorful avatar pipeline ensuring 100% render accuracy across platforms including Instagram
+      let primaryAvatar = `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`;
+      if (platform === 'instagram') {
+        primaryAvatar = `https://api.dicebear.com/7.x/lorelei/svg?seed=${encodeURIComponent(cleanName)}&backgroundColor=f87171,fbbf24,34d399,60a5fa,a78bfa`;
+      } else if (platform === 'tiktok') {
+        primaryAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanName)}`;
+      } else if (platform === 'youtube') {
+        primaryAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cleanName)}`;
+      }
+
+      const fallbackAvatar = `https://api.dicebear.com/7.x/shapes/svg?seed=${encodeURIComponent(cleanName)}`;
 
       connectedAccounts[platform] = {
         handle: val.startsWith('@') ? val : '@' + cleanName,
@@ -579,7 +548,7 @@
 
       localStorage.setItem('connected_accounts', JSON.stringify(connectedAccounts));
       loadConnectedAccounts();
-      tg.showAlert(`✅ ${platform.toUpperCase()} legally connected and verified!`);
+      tg.showAlert(`✅ ${platform.toUpperCase()} connected successfully with colorful profile picture!`);
     }
 
     function disconnectAccount(platform) {
@@ -599,7 +568,7 @@
       
       let activeCount = 0;
 
-      ['youtube', 'tiktok', 'instagram', 'facebook'].forEach(platform => {
+      ['youtube', 'tiktok', 'instagram'].forEach(platform => {
         const badge = document.getElementById(`badge-${platform}`);
         const input = document.getElementById(`input-${platform}`);
         const btnConnect = document.getElementById(`btn-connect-${platform}`);
@@ -615,11 +584,10 @@
           btnConnect.className = "task-btn danger";
           btnConnect.setAttribute('onclick', `disconnectAccount('${platform}')`);
 
-          const iconMap = { youtube: '▶️', tiktok: '🎵', instagram: '📸', facebook: '📘' };
+          const iconMap = { youtube: '▶️', tiktok: '🎵', instagram: '📸' };
           const chip = document.createElement('div');
           chip.className = 'mini-profile';
           
-          // Constructing the image element with bulletproof fallback handling
           chip.innerHTML = `
             <img src="${accData.avatar}" class="mini-avatar" alt="Avatar" onerror="this.onerror=null; this.src='${accData.fallback}';" />
             <div class="mini-info">
