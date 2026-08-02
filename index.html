@@ -8,39 +8,46 @@
     <!-- Monetag SDK Script -->
     <script src="https://alwingulla.com/88/tag.min.js" data-zone="3429762" async data-cfasync="false"></script>
 
-    <script>
-        // Automatically trigger the In-App Interstitial ad when loaded
-        document.addEventListener("DOMContentLoaded", function () {
-            // Check if the global ad function exists and trigger it
-            setTimeout(() => {
-                if (typeof window.show_3429762 === 'function') {
-                    window.show_3429762({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 3,
-                            capping: 0.1,
-                            interval: 5,
-                            timeout: 1,
-                            everyPage: true
-                        }
-                    }).catch(err => console.log("Ad error:", err));
-                }
-            }, 1000);
-        });
-    </script>
-
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background-color: #0f172a;
             color: #ffffff;
-            padding-top: 50px;
+            padding-top: 80px;
+        }
+        .ad-btn {
+            background-color: #22c55e;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>Loading your ad...</h1>
-    <p>Please wait.</p>
+    <h1>Welcome to Mini App</h1>
+    <p>Click below to load your ad and continue:</p>
+    
+    <button class="ad-btn" onclick="triggerAd()">Start / Watch Ad</button>
+
+    <script>
+        function triggerAd() {
+            if (typeof window.show_3429762 === 'function') {
+                window.show_3429762().then(() => {
+                    console.log("Ad finished successfully");
+                }).catch((err) => {
+                    console.error("Ad error:", err);
+                    alert("Ad is currently loading or unavailable. Please try again in a moment.");
+                });
+            } else {
+                alert("Ad SDK is still initializing. Please wait a second and try again.");
+            }
+        }
+    </script>
 </body>
 </html>
