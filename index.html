@@ -384,11 +384,12 @@
           handleTaskAction(actionType);
         });
       });
+    // Watch Ad Button
+    document.getElementById('watchAdBtn').addEventListener('click', () => {
+        watchAdForPoints();
+    });
 
-      // Watch Ad Button
-      document.getElementById('watchAdBtn').addEventListener('click', watchAdForPoints);
-
-      // Referral Share Button
+   // Referral Share Button
       document.getElementById('shareReferralBtn').addEventListener('click', shareReferralLink);
     }
 
@@ -605,6 +606,20 @@
       const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
       tg.openTelegramLink(shareUrl);
     }
-  </script>
+ <script>
+    document.getElementById("watchAdBtn").addEventListener("click", function() {
+        if (typeof show_3429762 === 'function') {
+            show_3429762().then(() => {
+                console.log("Ad watched successfully!");
+                // Add your +5 points logic here
+            }).catch((error) => {
+                console.error("Ad failed to show:", error);
+                window.Telegram.WebApp.showAlert("Ads are currently unavailable. Please try again in a moment.");
+            });
+        } else {
+            window.Telegram.WebApp.showAlert("Ad SDK is still loading, please wait...");
+        }
+    });
+ </script>
 </body>
 </html>
