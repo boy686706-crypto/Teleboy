@@ -31,21 +31,25 @@
 </head>
 <body>
     <h1>Welcome to Mini App</h1>
-    <p>Click below to load your ad and continue:</p>
+    <p>Click below to load your ad:</p>
     
     <button class="ad-btn" onclick="triggerAd()">Start / Watch Ad</button>
 
     <script>
         function triggerAd() {
-            if (typeof window.show_3429762 === 'function') {
-                window.show_3429762().then(() => {
+            // Dynamically find the correct Monetag global function generated for zone 3429762
+            const adFnName = "show_3429762";
+            
+            if (typeof window[adFnName] === 'function') {
+                window[adFnName]().then(() => {
                     console.log("Ad finished successfully");
                 }).catch((err) => {
                     console.error("Ad error:", err);
-                    alert("Ad is currently loading or unavailable. Please try again in a moment.");
+                    alert("Ad is currently filling. Please try again in 5 seconds.");
                 });
             } else {
-                alert("Ad SDK is still initializing. Please wait a second and try again.");
+                // Fallback check if the script is still loading
+                alert("Ad SDK is still connecting to network. Please wait a moment and try again.");
             }
         }
     </script>
