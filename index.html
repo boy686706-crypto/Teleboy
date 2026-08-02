@@ -361,13 +361,19 @@
     });
 
     function initEventListeners() {
-      // Main Tab Navigation
-      document.querySelectorAll('.tab-btn').forEach(btn => {
+          // Safe Main Tab Navigation Handler
+    document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const tabName = e.currentTarget.getAttribute('data-tab');
-          switchTab(tabName, e.currentTarget);
-        });
-      });
+            try {
+                const tabName = e.currentTarget.getAttribute('data-tab');
+                if (tabName) {
+                    switchTab(tabName, e.currentTarget);
+                }
+            } catch (err) {
+                console.error("Navigation error:", err);
+            }
+    });
+
 
       // Earn Platform Switcher
       document.querySelectorAll('.platform-chip').forEach(chip => {
