@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Mini App</title>
     
-    <!-- Paste your Monetag Zone Script here -->
+    <!-- Monetag SDK Script -->
     <script src="https://alwingulla.com/88/tag.min.js" data-zone="3429762" async data-cfasync="false"></script>
+
+    <script>
+        // Automatically trigger the In-App Interstitial ad when loaded
+        document.addEventListener("DOMContentLoaded", function () {
+            // Check if the global ad function exists and trigger it
+            setTimeout(() => {
+                if (typeof window.show_3429762 === 'function') {
+                    window.show_3429762({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 3,
+                            capping: 0.1,
+                            interval: 5,
+                            timeout: 1,
+                            everyPage: true
+                        }
+                    }).catch(err => console.log("Ad error:", err));
+                }
+            }, 1000);
+        });
+    </script>
 
     <style>
         body {
@@ -19,7 +40,7 @@
     </style>
 </head>
 <body>
-    <h1>Loading your app...</h1>
-    <p>Please wait while the page loads.</p>
+    <h1>Loading your ad...</h1>
+    <p>Please wait.</p>
 </body>
 </html>
