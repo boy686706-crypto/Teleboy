@@ -166,7 +166,7 @@
       <div class="balance-amount"><span id="userPoints">100</span> PTS</div>
 
       <button class="btn btn-ad" id="watchAdBtn">
-        📺 Watch Ad (+20 Instant Points)
+        📺 Watch Ad (+5 Instant Points)
       </button>
     </div>
 
@@ -505,17 +505,32 @@
 
     function watchAdForPoints() {
       showMonetagAd(() => {
-        updatePoints(20);
-        tg.showAlert("🎉 You earned +20 Points for watching the ad!");
+        updatePoints(5);
+        tg.showAlert("🎉 You earned +5 Points for watching the ad!");
       });
     }
 
     function showMonetagAd(rewardCallback) {
-      const showAdFunc = window[`show_${ZONE_ID}`] || Object.keys(window).find(key => key.startsWith('show_') && typeof window[key] === 'function');
-      if (showAdFunc && typeof window[showAdFunc] === 'function') {
-        window[showAdFunc]().then(() => { rewardCallback(); }).catch(() => { tg.showAlert("Ad closed early!"); });
+      if (typeof show_3429762 === 'function') {
+        show_3429762().then(() => {
+          rewardCallback();
+        }).catch((err) => {
+          console.error("Monetag ad error:", err);
+          rewardCallback(); // Fallback to grant reward seamlessly if ad render is blocked by adblockers/environment
+        });
       } else {
-        tg.showAlert("Connecting to ad network... Try again in a few seconds!");
+        // Fallback robust checker in case SDK injects under a dynamic name
+        let foundFn = Object.keys(window).find(key => key.startsWith('show_') && typeof window[key] === 'function');
+        if (foundFn) {
+          window[foundFn]().then(() => {
+            rewardCallback();
+          }).catch(() => {
+            rewardCallback();
+          });
+        } else {
+          // If SDK tag is fully missing/blocked, execute callback directly to ensure smooth functionality
+          rewardCallback();
+        }
       }
     }
 
@@ -575,7 +590,7 @@
     function shareReferralLink() {
       const userId = tg.initDataUnsafe?.user?.id || 'demo';
       const referralLink = `https://t.me/${BOT_USERNAME}?startapp=${userId}`;
-      const shareText = "🔥 Join me to get REAL free Telegram subscribers, views, and likes!";
+      const shareText = "🔥 Join me to get real free social subscriber, likes and views.";
       const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(shareText)}`;
       tg.openTelegramLink(shareUrl);
     }
