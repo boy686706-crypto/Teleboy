@@ -146,6 +146,15 @@
       box-sizing: border-box;
       outline: none;
     }
+
+    .store-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #334155;
+    }
+    .store-card h4 { margin: 0 0 10px 0; font-size: 15px; color: var(--text); }
   </style>
 </head>
 <body>
@@ -161,7 +170,7 @@
       </button>
     </div>
 
-    <!-- Main Navigation Tabs (Removed Accounts Tab) -->
+    <!-- Main Navigation Tabs -->
     <div class="nav-tabs">
       <button class="tab-btn active" data-tab="earn">Earn Points</button>
       <button class="tab-btn" data-tab="store">🎁 Store</button>
@@ -226,34 +235,67 @@
       </div>
     </div>
 
-    <!-- TAB 2: STORE -->
+    <!-- TAB 2: STORE (Updated based on user image specification) -->
     <div id="tab-store" class="tab-content">
       <h3>Redeem Points Shop</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
-        Spend your points to get instant followers, likes, or subscribers for your accounts!
+        Spend your points to claim your packages instantly!
       </p>
 
-      <form id="storeForm">
-        <div class="input-group">
-          <label>Select Reward Package</label>
-          <select id="storeItem" required>
-            <option value="tg_members_50">50 Telegram Channel Members (250 PTS)</option>
-            <option value="yt_subs_25">25 YouTube Subscribers (250 PTS)</option>
-            <option value="yt_likes_50">50 YouTube Video Likes (200 PTS)</option>
-            <option value="tt_followers_50">50 TikTok Followers (200 PTS)</option>
-            <option value="tt_likes_50">50 TikTok Post Likes (200 PTS)</option>
-          </select>
-        </div>
+      <!-- 1. Telegram Members -->
+      <div class="store-card">
+        <h4>10 telegram members (200 PTS)</h4>
+        <form onsubmit="handleDirectRedeem(event, 200, '10 telegram members')">
+          <div class="input-group" style="margin-bottom:8px;">
+            <input type="text" placeholder="(Channel username)" required />
+          </div>
+          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+        </form>
+      </div>
 
-        <div class="input-group">
-          <label>Your Channel / Account / Post Link</label>
-          <input type="url" id="storeTargetUrl" placeholder="https://..." required />
-        </div>
+      <!-- 2. Youtube Subscribers -->
+      <div class="store-card">
+        <h4>10 Youtube subscribers (200 PTS)</h4>
+        <form onsubmit="handleDirectRedeem(event, 200, '10 Youtube subscribers')">
+          <div class="input-group" style="margin-bottom:8px;">
+            <input type="text" placeholder="(Channel id)" required />
+          </div>
+          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+        </form>
+      </div>
 
-        <button type="submit" class="btn btn-primary">
-          🎁 Claim & Redeem Now
-        </button>
-      </form>
+      <!-- 3. Tiktok Followers -->
+      <div class="store-card">
+        <h4>10 tiktok followers (200 PTS)</h4>
+        <form onsubmit="handleDirectRedeem(event, 200, '10 tiktok followers')">
+          <div class="input-group" style="margin-bottom:8px;">
+            <input type="text" placeholder="(Profile username)" required />
+          </div>
+          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+        </form>
+      </div>
+
+      <!-- 4. Tiktok Likes -->
+      <div class="store-card">
+        <h4>15 tiktok likes (200 PTS)</h4>
+        <form onsubmit="handleDirectRedeem(event, 200, '15 tiktok likes')">
+          <div class="input-group" style="margin-bottom:8px;">
+            <input type="url" placeholder="(video link)" required />
+          </div>
+          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+        </form>
+      </div>
+
+      <!-- 5. Tiktok Views -->
+      <div class="store-card">
+        <h4>15 tiktok views (200 PTS)</h4>
+        <form onsubmit="handleDirectRedeem(event, 200, '15 tiktok views')">
+          <div class="input-group" style="margin-bottom:8px;">
+            <input type="url" placeholder="(video link)" required />
+          </div>
+          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+        </form>
+      </div>
     </div>
 
     <!-- TAB 3: REFERRAL -->
@@ -311,14 +353,6 @@
       ]
     };
 
-    const storePrices = {
-      'tg_members_50': 250,
-      'yt_subs_25': 250,
-      'yt_likes_50': 200,
-      'tt_followers_50': 200,
-      'tt_likes_50': 200
-    };
-
     document.addEventListener("DOMContentLoaded", () => {
       initEventListeners();
       renderAllTasks();
@@ -352,9 +386,6 @@
 
       // Watch Ad Button
       document.getElementById('watchAdBtn').addEventListener('click', watchAdForPoints);
-
-      // Store Submission Form
-      document.getElementById('storeForm').addEventListener('submit', handleStoreRedeem);
 
       // Referral Share Button
       document.getElementById('shareReferralBtn').addEventListener('click', shareReferralLink);
@@ -518,20 +549,19 @@
       if (targetPlatform) targetPlatform.style.display = 'block';
     }
 
-    function handleStoreRedeem(e) {
+    function handleDirectRedeem(e, cost, itemName) {
       e.preventDefault();
-      const itemKey = document.getElementById('storeItem').value;
-      const targetUrl = document.getElementById('storeTargetUrl').value;
-      const cost = storePrices[itemKey] || 200;
+      const inputField = e.target.querySelector('input');
+      const targetValue = inputField ? inputField.value.trim() : '';
 
       if (userPoints < cost) {
-        tg.showAlert(`❌ You need ${cost} points to claim this package. Earn more points first!`);
+        tg.showAlert(`❌ You need ${cost} PTS to claim this package. Earn more points first!`);
         return;
       }
 
       updatePoints(-cost);
-      tg.showAlert(`🎉 Success! Your order has been placed for ${targetUrl}. Delivery will begin shortly.`);
-      document.getElementById('storeTargetUrl').value = '';
+      tg.showAlert(`🎉 Success! Your order for "${itemName}" (${targetValue}) has been placed. Delivery will begin shortly.`);
+      if (inputField) inputField.value = '';
     }
 
     function shareReferralLink() {
