@@ -192,9 +192,9 @@
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-tg-join">Join Telegram Channel</h4>
-            <p id="sub-tg-join">Reward: +15 Points</p>
+            <p id="sub-tg-join">Reward: +5 Points</p>
           </div>
-          <button id="btn-tg-join" class="task-btn" data-action="tg-join">Join (+15)</button>
+          <button id="btn-tg-join" class="task-btn" data-action="tg-join">Follow (+5)</button>
         </div>
       </div>
 
@@ -203,16 +203,16 @@
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-yt-sub">Subscribe to Channel</h4>
-            <p id="sub-yt-sub">Reward: +15 Points</p>
+            <p id="sub-yt-sub">Reward: +5 Points</p>
           </div>
-          <button id="btn-yt-sub" class="task-btn" data-action="yt-sub">Subscribe (+15)</button>
+          <button id="btn-yt-sub" class="task-btn" data-action="yt-sub">Follow (+5)</button>
         </div>
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-yt-like">Like YouTube Video</h4>
-            <p id="sub-yt-like">Reward: +10 Points</p>
+            <p id="sub-yt-like">Reward: +3 Points</p>
           </div>
-          <button id="btn-yt-like" class="task-btn" data-action="yt-like">Like (+10)</button>
+          <button id="btn-yt-like" class="task-btn" data-action="yt-like">Like (+3)</button>
         </div>
       </div>
 
@@ -221,79 +221,79 @@
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-tt-follow">Follow TikTok Profile</h4>
-            <p id="sub-tt-follow">Reward: +10 Points</p>
+            <p id="sub-tt-follow">Reward: +5 Points</p>
           </div>
-          <button id="btn-tt-follow" class="task-btn" data-action="tt-follow">Follow (+10)</button>
+          <button id="btn-tt-follow" class="task-btn" data-action="tt-follow">Follow (+5)</button>
         </div>
         <div class="task-item">
           <div class="task-info">
             <h4 id="title-tt-like">Like TikTok Post</h4>
-            <p id="sub-tt-like">Reward: +10 Points</p>
+            <p id="sub-tt-like">Reward: +3 Points</p>
           </div>
-          <button id="btn-tt-like" class="task-btn" data-action="tt-like">Like (+10)</button>
+          <button id="btn-tt-like" class="task-btn" data-action="tt-like">Like (+3)</button>
         </div>
       </div>
     </div>
 
-    <!-- TAB 2: STORE (Updated based on user image specification) -->
+    <!-- TAB 2: STORE -->
     <div id="tab-store" class="tab-content">
       <h3>Redeem Points Shop</h3>
       <p style="font-size: 13px; color: var(--subtext); margin-bottom: 16px;">
-        Spend your points to claim your packages instantly!
+        Watch an ad to claim your packages instantly!
       </p>
 
       <!-- 1. Telegram Members -->
       <div class="store-card">
         <h4>10 telegram members (200 PTS)</h4>
-        <form onsubmit="handleDirectRedeem(event, 200, '10 telegram members')">
+        <form onsubmit="handleAdClaimRedeem(event, 200, '10 telegram members')">
           <div class="input-group" style="margin-bottom:8px;">
             <input type="text" placeholder="(Channel username)" required />
           </div>
-          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+          <button type="submit" class="btn btn-ad" style="width:100%; padding:10px; margin-bottom:0; font-size:14px;">📺 Watch Ads & Claim</button>
         </form>
       </div>
 
       <!-- 2. Youtube Subscribers -->
       <div class="store-card">
         <h4>10 Youtube subscribers (200 PTS)</h4>
-        <form onsubmit="handleDirectRedeem(event, 200, '10 Youtube subscribers')">
+        <form onsubmit="handleAdClaimRedeem(event, 200, '10 Youtube subscribers')">
           <div class="input-group" style="margin-bottom:8px;">
             <input type="text" placeholder="(Channel id)" required />
           </div>
-          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+          <button type="submit" class="btn btn-ad" style="width:100%; padding:10px; margin-bottom:0; font-size:14px;">📺 Watch Ads & Claim</button>
         </form>
       </div>
 
       <!-- 3. Tiktok Followers -->
       <div class="store-card">
         <h4>10 tiktok followers (200 PTS)</h4>
-        <form onsubmit="handleDirectRedeem(event, 200, '10 tiktok followers')">
+        <form onsubmit="handleAdClaimRedeem(event, 200, '10 tiktok followers')">
           <div class="input-group" style="margin-bottom:8px;">
             <input type="text" placeholder="(Profile username)" required />
           </div>
-          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+          <button type="submit" class="btn btn-ad" style="width:100%; padding:10px; margin-bottom:0; font-size:14px;">📺 Watch Ads & Claim</button>
         </form>
       </div>
 
       <!-- 4. Tiktok Likes -->
       <div class="store-card">
         <h4>15 tiktok likes (200 PTS)</h4>
-        <form onsubmit="handleDirectRedeem(event, 200, '15 tiktok likes')">
+        <form onsubmit="handleAdClaimRedeem(event, 200, '15 tiktok likes')">
           <div class="input-group" style="margin-bottom:8px;">
             <input type="url" placeholder="(video link)" required />
           </div>
-          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+          <button type="submit" class="btn btn-ad" style="width:100%; padding:10px; margin-bottom:0; font-size:14px;">📺 Watch Ads & Claim</button>
         </form>
       </div>
 
       <!-- 5. Tiktok Views -->
       <div class="store-card">
         <h4>15 tiktok views (200 PTS)</h4>
-        <form onsubmit="handleDirectRedeem(event, 200, '15 tiktok views')">
+        <form onsubmit="handleAdClaimRedeem(event, 200, '15 tiktok views')">
           <div class="input-group" style="margin-bottom:8px;">
             <input type="url" placeholder="(video link)" required />
           </div>
-          <button type="submit" class="task-btn" style="width:100%; padding:10px;">Claim Package</button>
+          <button type="submit" class="btn btn-ad" style="width:100%; padding:10px; margin-bottom:0; font-size:14px;">📺 Watch Ads & Claim</button>
         </form>
       </div>
     </div>
@@ -324,32 +324,32 @@
 
     let pendingVerification = JSON.parse(localStorage.getItem('pending_verification') || '{}');
 
-    // Dynamic Rotating Task Databases
+    // Dynamic Rotating Task Databases updated to lower point rewards (5 followers, 3 likes)
     const taskPools = {
       'tg-join': [
-        { id: 'tg_1', name: 'Join Channel: Tech Insider', url: 'https://t.me/telegram', reward: 15 },
-        { id: 'tg_2', name: 'Join Channel: Crypto Alpha', url: 'https://t.me/durov', reward: 15 },
-        { id: 'tg_3', name: 'Join Channel: Global News Network', url: 'https://t.me/rtnews', reward: 15 }
+        { id: 'tg_1', name: 'Join Channel: Tech Insider', url: 'https://t.me/telegram', reward: 5 },
+        { id: 'tg_2', name: 'Join Channel: Crypto Alpha', url: 'https://t.me/durov', reward: 5 },
+        { id: 'tg_3', name: 'Join Channel: Global News Network', url: 'https://t.me/rtnews', reward: 5 }
       ],
       'yt-sub': [
-        { id: 'yt_sub_1', name: 'Subscribe: MrBeast Channel', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 15 },
-        { id: 'yt_sub_2', name: 'Subscribe: PewDiePie Channel', url: 'https://www.youtube.com/@PewDiePie?sub_confirmation=1', reward: 15 },
-        { id: 'yt_sub_3', name: 'Subscribe: Marques Brownlee', url: 'https://www.youtube.com/@mkbhd?sub_confirmation=1', reward: 15 }
+        { id: 'yt_sub_1', name: 'Subscribe: MrBeast Channel', url: 'https://www.youtube.com/@MrBeast?sub_confirmation=1', reward: 5 },
+        { id: 'yt_sub_2', name: 'Subscribe: PewDiePie Channel', url: 'https://www.youtube.com/@PewDiePie?sub_confirmation=1', reward: 5 },
+        { id: 'yt_sub_3', name: 'Subscribe: Marques Brownlee', url: 'https://www.youtube.com/@mkbhd?sub_confirmation=1', reward: 5 }
       ],
       'yt-like': [
-        { id: 'yt_l_1', name: 'Like Video: Music Video Hit', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', reward: 10 },
-        { id: 'yt_l_2', name: 'Like Video: Tech Gadget Review', url: 'https://www.youtube.com/watch?v=9bZkp7q19f0', reward: 10 },
-        { id: 'yt_l_3', name: 'Like Video: Nature Wildlife Documentary', url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', reward: 10 }
+        { id: 'yt_l_1', name: 'Like Video: Music Video Hit', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', reward: 3 },
+        { id: 'yt_l_2', name: 'Like Video: Tech Gadget Review', url: 'https://www.youtube.com/watch?v=9bZkp7q19f0', reward: 3 },
+        { id: 'yt_l_3', name: 'Like Video: Nature Wildlife Documentary', url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', reward: 3 }
       ],
       'tt-follow': [
-        { id: 'tt_f_1', name: 'Follow Profile: TikTok Creator Alpha', url: 'https://www.tiktok.com/@tiktok', reward: 10 },
-        { id: 'tt_f_2', name: 'Follow Profile: Khaby Lame', url: 'https://www.tiktok.com/@khaby.lame', reward: 10 },
-        { id: 'tt_f_3', name: 'Follow Profile: Charli D’Amelio', url: 'https://www.tiktok.com/@charlidamelio', reward: 10 }
+        { id: 'tt_f_1', name: 'Follow Profile: TikTok Creator Alpha', url: 'https://www.tiktok.com/@tiktok', reward: 5 },
+        { id: 'tt_f_2', name: 'Follow Profile: Khaby Lame', url: 'https://www.tiktok.com/@khaby.lame', reward: 5 },
+        { id: 'tt_f_3', name: 'Follow Profile: Charli D’Amelio', url: 'https://www.tiktok.com/@charlidamelio', reward: 5 }
       ],
       'tt-like': [
-        { id: 'tt_l_1', name: 'Like Post: Viral Dance Challenge', url: 'https://www.tiktok.com/@tiktok/video/7000000000000000001', reward: 10 },
-        { id: 'tt_l_2', name: 'Like Post: Comedy Skit Highlight', url: 'https://www.tiktok.com/@tiktok/video/7000000000000000002', reward: 10 },
-        { id: 'tt_l_3', name: 'Like Post: Cooking Masterclass', url: 'https://www.tiktok.com/@tiktok/video/7000000000000000003', reward: 10 }
+        { id: 'tt_l_1', name: 'Like Post: Viral Dance Challenge', url: 'https://www.tiktok.com/@tiktok/video/7000000000000000001', reward: 3 },
+        { id: 'tt_l_2', name: 'Like Post: Comedy Skit Highlight', url: 'https://www.tiktok.com/@tiktok/video/7000000000000000002', reward: 3 },
+        { id: 'tt_l_3', name: 'Like Post: Cooking Masterclass', url: 'https://www.tiktok.com/@tiktok/video/7000000000000000003', reward: 3 }
       ]
     };
 
@@ -549,19 +549,27 @@
       if (targetPlatform) targetPlatform.style.display = 'block';
     }
 
-    function handleDirectRedeem(e, cost, itemName) {
+    function handleAdClaimRedeem(e, cost, itemName) {
       e.preventDefault();
       const inputField = e.target.querySelector('input');
       const targetValue = inputField ? inputField.value.trim() : '';
+
+      if (!targetValue) {
+        tg.showAlert("❌ Please fill in your link or username.");
+        return;
+      }
 
       if (userPoints < cost) {
         tg.showAlert(`❌ You need ${cost} PTS to claim this package. Earn more points first!`);
         return;
       }
 
-      updatePoints(-cost);
-      tg.showAlert(`🎉 Success! Your order for "${itemName}" (${targetValue}) has been placed. Delivery will begin shortly.`);
-      if (inputField) inputField.value = '';
+      // Trigger Monetag Ad first before deducting points and placing the claim order
+      showMonetagAd(() => {
+        updatePoints(-cost);
+        tg.showAlert(`🎉 Ad completed successfully! Your order for "${itemName}" (${targetValue}) has been placed. Delivery will begin shortly.`);
+        if (inputField) inputField.value = '';
+      });
     }
 
     function shareReferralLink() {
